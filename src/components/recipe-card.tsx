@@ -1,8 +1,9 @@
+
 "use client";
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Play, Pause, Trash2 } from "lucide-react";
+import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Play, Pause, Trash2, ImageOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -126,14 +127,21 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
     <div className="w-full overflow-hidden printable-area">
       <CardHeader className="p-0">
         <div className="relative h-64 w-full">
-          <Image
-            src={recipe.imageUrl || "https://placehold.co/600x400/C45720/F5F5DC"}
-            alt={recipe.recipeName}
-            fill
-            objectFit="cover"
-            data-ai-hint="gourmet food"
-            className="bg-muted"
-          />
+          {recipe.imageUrl ? (
+            <Image
+              src={recipe.imageUrl}
+              alt={recipe.recipeName}
+              fill
+              objectFit="cover"
+              data-ai-hint="gourmet food"
+              className="bg-muted"
+            />
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
+              <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
+              <p>កំពុងបង្កើតរូបភាព ...</p>
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-0 left-0 p-6">
             <CardTitle className="font-headline text-3xl font-bold text-white">
