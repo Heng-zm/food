@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,9 @@ const cuisineOptions = [
 const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedRecipe, setSuggestedRecipe] = useState<SuggestRecipeOutput | null>(null);
+  const [isListening, setIsListening] = useState(false);
   const { toast } = useToast();
+  const recognitionRef = useRef<any>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,6 +68,58 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
       dietaryRestrictions: "",
     },
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.lang = 'km-KH';
+        recognitionRef.current.interimResults = false;
+
+        recognitionRef.current.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          const currentIngredients = form.getValues("ingredients");
+          form.setValue("ingredients", currentIngredients ? `${currentIngredients}, ${transcript}`: transcript);
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error("Speech recognition error", event.error);
+          toast({
+            variant: "destructive",
+            title: "បញ្ហាក្នុងការស្គាល់សំឡេង",
+            description: "មិនអាចដំណើរការការបញ្ចូលដោយសំឡេងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+          });
+          setIsListening(false);
+        };
+        
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+
+      }
+    }
+  }, [form, toast]);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+       toast({
+        variant: "destructive",
+        title: "មុខងារមិនគាំទ្រ",
+        description: "ការស្គាល់សំឡេងមិនត្រូវបានគាំទ្រនៅលើកម្មវិធីរុករកនេះទេ។",
+      });
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      recognitionRef.current.start();
+    }
+    setIsListening(!isListening);
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -111,12 +165,29 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>គ្រឿងផ្សំដែលមាន</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស"
-                          {...field}
-                        />
-                      </FormControl>
+                       <div className="relative">
+                        <FormControl>
+                          <Textarea
+                            placeholder="ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស"
+                            {...field}
+                            rows={4}
+                          />
+                        </FormControl>
+                         <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={toggleListening}
+                          className="absolute bottom-2 right-2"
+                          aria-label={isListening ? 'បញ្ឈប់ការស្តាប់' : 'ចាប់ផ្តើមការស្តាប់'}
+                        >
+                          {isListening ? (
+                            <MicOff className="h-5 w-5 text-red-500" />
+                          ) : (
+                            <Mic className="h-5 w-5 text-primary" />
+                          )}
+                        </Button>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}

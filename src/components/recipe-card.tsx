@@ -1,11 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen } from "lucide-react";
+import { useState } from "react";
+import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Volume2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { getSpeechFromText } from "@/app/actions";
 import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
 
 interface RecipeCardProps {
@@ -15,6 +18,9 @@ interface RecipeCardProps {
 }
 
 const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) => {
+  const [isReadingAloud, setIsReadingAloud] = useState(false);
+  const { toast } = useToast();
+
   const handlePrint = () => {
     window.print();
   };
@@ -23,6 +29,24 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) =
     if(!text) return [];
     return text.split('\n').map(item => item.trim().replace(/^-/,'').trim()).filter(Boolean);
   }
+  
+  const handleReadAloud = async () => {
+    setIsReadingAloud(true);
+    const textToRead = `ការណែនាំ៖\n${recipe.instructions}`;
+    const result = await getSpeechFromText({ text: textToRead });
+    setIsReadingAloud(false);
+
+    if (result.success && result.data?.audioUrl) {
+      const audio = new Audio(result.data.audioUrl);
+      audio.play();
+    } else {
+      toast({
+        variant: "destructive",
+        title: "មានបញ្ហាក្នុងការបង្កើតសំឡេង",
+        description: result.error || "មិនអាចបង្កើតការអានឮៗបានទេ។",
+      });
+    }
+  };
 
   const ingredientsList = parseList(recipe.ingredients);
   const instructionsList = parseList(recipe.instructions);
@@ -99,10 +123,26 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) =
             </ul>
           </div>
           <div>
-            <h3 className="mb-4 flex items-center gap-2 font-headline text-xl font-bold">
-              <BookOpen className="h-6 w-6 text-primary" />
-              ការណែនាំ
-            </h3>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 font-headline text-xl font-bold">
+                <BookOpen className="h-6 w-6 text-primary" />
+                ការណែនាំ
+              </h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleReadAloud}
+                disabled={isReadingAloud}
+                aria-label="អានការណែនាំឮៗ"
+                className="no-print"
+              >
+                {isReadingAloud ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Volume2 className="h-5 w-5 text-primary" />
+                )}
+              </Button>
+            </div>
             <ol className="space-y-4">
                {instructionsList.map((instruction, index) => (
                 <li key={index} className="flex items-start gap-3">
