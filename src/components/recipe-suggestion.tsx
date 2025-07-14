@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Mic, MicOff } from "lucide-react";
+import { Loader2, Mic, MicOff, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import RecipeCard from "@/components/recipe-card";
 import { getRecipeSuggestion } from "@/app/actions";
 import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
+import { Badge } from "@/components/ui/badge";
 
 const formSchema = z.object({
   ingredients: z.string().min(3, {
@@ -52,6 +53,20 @@ const cuisineOptions = [
   "ម៉ិកស៊ិក",
   "បារាំង",
 ];
+
+const recommendedDishes = [
+    "សម្លរកកូរ",
+    "អាម៉ុកត្រី",
+    "ក๋วยเตี๋ยว (គុយទាវ)",
+    "សម្លរម្ជូរគ្រឿងសាច់គោ",
+    "ឆាក្តៅសាច់មាន់",
+    "ឡុកឡាក់សាច់គោ",
+    "បាយសាច់ជ្រូក",
+    "សម្លរការីសាច់មាន់",
+    "ឆាខ្ញីសាច់មាន់",
+    "ត្រីអាំងអំបិលម្ទេស",
+];
+
 
 const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -137,6 +152,12 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
       });
     }
   }
+
+  const handleRecommendedDishClick = (dish: string) => {
+    form.setValue("ingredients", dish);
+    form.setValue("cuisine", "ខ្មែរ");
+    form.handleSubmit(onSubmit)();
+  };
 
   const LoadingSkeleton = () => (
     <Card className="mt-8 w-full">
@@ -244,6 +265,26 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
               </Button>
             </form>
           </Form>
+
+          <div className="mt-8 pt-6 border-t">
+             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <Sparkles className="h-4 w-4"/>
+                ឬសាកល្បងមុខម្ហូបណាមួយក្នុងចំណោមមុខម្ហូបទាំងនេះ
+            </h3>
+            <div className="flex flex-wrap gap-2">
+                {recommendedDishes.map((dish) => (
+                    <Badge 
+                        key={dish}
+                        variant="outline"
+                        onClick={() => handleRecommendedDishClick(dish)}
+                        className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                        tabIndex={0}
+                    >
+                        {dish}
+                    </Badge>
+                ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
