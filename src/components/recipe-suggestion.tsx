@@ -93,21 +93,27 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
         recognitionRef.current.lang = 'km-KH';
         recognitionRef.current.interimResults = false;
 
+        recognitionRef.current.onstart = () => {
+          setIsListening(true);
+        };
+
         recognitionRef.current.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
           const currentIngredients = form.getValues("ingredients");
           form.setValue("ingredients", currentIngredients ? `${currentIngredients}, ${transcript}`: transcript);
-          setIsListening(false);
         };
 
         recognitionRef.current.onerror = (event: any) => {
           console.error("Speech recognition error", event.error);
+          let errorMessage = "មិនអាចដំណើរការការបញ្ចូលដោយសំឡេងបានទេ។ សូមព្យាយាមម្តងទៀត។";
+          if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+            errorMessage = "ការចូលប្រើមីក្រូហ្វូនត្រូវបានបដិសេធ។ សូមអនុញ្ញាតឱ្យប្រើមីក្រូហ្វូននៅក្នុងការកំណត់កម្មវិធីរុករករបស់អ្នក។";
+          }
           toast({
             variant: "destructive",
             title: "បញ្ហាក្នុងការស្គាល់សំឡេង",
-            description: "មិនអាចដំណើរការការបញ្ចូលដោយសំឡេងបានទេ។ សូមព្យាយាមម្តងទៀត។",
+            description: errorMessage,
           });
-          setIsListening(false);
         };
         
         recognitionRef.current.onend = () => {
@@ -129,10 +135,20 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     }
     if (isListening) {
       recognitionRef.current.stop();
+      setIsListening(false);
     } else {
-      recognitionRef.current.start();
+      try {
+        recognitionRef.current.start();
+      } catch (e) {
+        console.error("Could not start recognition", e);
+        toast({
+            variant: "destructive",
+            title: "បញ្ហាក្នុងការចាប់ផ្តើម",
+            description: "មិនអាចចាប់ផ្តើមការស្តាប់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+        });
+        setIsListening(false);
+      }
     }
-    setIsListening(!isListening);
   };
 
 
@@ -203,7 +219,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                           aria-label={isListening ? 'បញ្ឈប់ការស្តាប់' : 'ចាប់ផ្តើមការស្តាប់'}
                         >
                           {isListening ? (
-                            <MicOff className="h-5 w-5 text-red-500" />
+                            <MicOff className="h-5 w-5 text-red-500 animate-pulse" />
                           ) : (
                             <Mic className="h-5 w-5 text-primary" />
                           )}
@@ -303,3 +319,5 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 };
 
 export default RecipeSuggestion;
+
+    
