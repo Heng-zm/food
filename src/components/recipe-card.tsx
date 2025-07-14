@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Volume2, Loader2, Trash2 } from "lucide-react";
+import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Volume2, Loader2, Trash2, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { getSpeechFromText } from "@/app/actions";
 import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
 import {
   AlertDialog,
@@ -29,8 +28,13 @@ interface RecipeCardProps {
 }
 
 const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false }: RecipeCardProps) => {
-  const [isReadingAloud, setIsReadingAloud] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audio] = useState(() => (typeof Audio !== 'undefined' && recipe.audioUrl) ? new Audio(recipe.audioUrl) : null);
   const { toast } = useToast();
+
+  if (audio) {
+    audio.onended = () => setIsPlaying(false);
+  }
 
   const handlePrint = () => {
     window.print();
@@ -42,20 +46,21 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   }
   
   const handleReadAloud = async () => {
-    setIsReadingAloud(true);
-    const textToRead = `ការណែនាំ៖\n${recipe.instructions}`;
-    const result = await getSpeechFromText({ text: textToRead });
-    setIsReadingAloud(false);
-
-    if (result.success && result.data?.audioUrl) {
-      const audio = new Audio(result.data.audioUrl);
-      audio.play();
-    } else {
+    if (!audio) {
       toast({
         variant: "destructive",
-        title: "មានបញ្ហាក្នុងការបង្កើតសំឡេង",
-        description: result.error || "មិនអាចបង្កើតការអានឮៗបានទេ។",
+        title: "មិនអាចចាក់សំឡេងបានទេ",
+        description: "ឯកសារអូឌីយ៉ូមិនមានសម្រាប់រូបមន្តនេះទេ។",
       });
+      return;
+    }
+
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    } else {
+      audio.play();
+      setIsPlaying(true);
     }
   };
 
@@ -175,14 +180,14 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                 variant="ghost"
                 size="icon"
                 onClick={handleReadAloud}
-                disabled={isReadingAloud}
+                disabled={!recipe.audioUrl}
                 aria-label="អានការណែនាំឮៗ"
                 className="no-print"
               >
-                {isReadingAloud ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                {isPlaying ? (
+                  <Pause className="h-5 w-5 text-primary" />
                 ) : (
-                  <Volume2 className="h-5 w-5 text-primary" />
+                  <Play className="h-5 w-5 text-primary" />
                 )}
               </Button>
             </div>

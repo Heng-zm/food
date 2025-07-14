@@ -13,6 +13,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { generateRecipeImage } from './generate-recipe-image';
+import { textToSpeech } from './text-to-speech';
 
 const SuggestRecipeInputSchema = z.object({
   ingredients: z
@@ -33,6 +34,7 @@ const SuggestRecipeOutputSchema = z.object({
   estimatedCookingTime: z.string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
   nutritionalInformation: z.string().describe('ព័ត៌មានអាហារូបត្ថម្ភសម្រាប់រូបមន្ត។'),
   imageUrl: z.string().optional().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
+  audioUrl: z.string().optional().describe("URL ទិន្នន័យនៃសំឡេងនៃការណែនាំ។"),
 });
 export type SuggestRecipeOutput = z.infer<typeof SuggestRecipeOutputSchema>;
 
@@ -79,11 +81,15 @@ const suggestRecipeFlow = ai.defineFlow(
         return output!;
     })();
     
-    const {imageUrl} = await generateRecipeImage({recipeName: recipeDetails.recipeName});
+    const [imageResult, audioResult] = await Promise.all([
+      generateRecipeImage({recipeName: recipeDetails.recipeName}),
+      textToSpeech({text: `ការណែនាំ៖\n${recipeDetails.instructions}`})
+    ]);
 
     return {
       ...recipeDetails,
-      imageUrl: imageUrl,
+      imageUrl: imageResult.imageUrl,
+      audioUrl: audioResult.audioUrl,
     };
   }
 );
