@@ -2,22 +2,33 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Volume2, Loader2 } from "lucide-react";
+import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Volume2, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { getSpeechFromText } from "@/app/actions";
 import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface RecipeCardProps {
   recipe: SuggestRecipeOutput;
   isFavorite: boolean;
   onToggleFavorite: (recipe: SuggestRecipeOutput) => void;
+  showRemoveConfirm?: boolean;
 }
 
-const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) => {
+const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false }: RecipeCardProps) => {
   const [isReadingAloud, setIsReadingAloud] = useState(false);
   const { toast } = useToast();
 
@@ -51,6 +62,45 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) =
   const ingredientsList = parseList(recipe.ingredients);
   const instructionsList = parseList(recipe.instructions);
 
+  const FavoriteButton = () => (
+    <Button
+      variant="secondary"
+      size="icon"
+      onClick={() => onToggleFavorite(recipe)}
+      aria-label={isFavorite ? "ដកចេញពីចំណូលចិត្ត" : "បន្ថែមទៅចំណូលចិត្ត"}
+    >
+      <Heart className={`h-5 w-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-primary"}`} />
+    </Button>
+  );
+
+  const RemoveFavoriteButton = () => (
+     <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="destructive"
+          size="icon"
+          aria-label="ដកចេញពីចំណូលចិត្ត"
+        >
+          <Trash2 className="h-5 w-5" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>តើអ្នកប្រាកដទេ?</AlertDialogTitle>
+          <AlertDialogDescription>
+            សកម្មភាពនេះនឹងដក "{recipe.recipeName}" ចេញពីបញ្ជីចំណូលចិត្តរបស់អ្នកជាអចិន្ត្រៃយ៍។
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>បោះបង់</AlertDialogCancel>
+          <AlertDialogAction onClick={() => onToggleFavorite(recipe)}>
+            ដកចេញ
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+
   return (
     <Card className="w-full overflow-hidden printable-area">
       <CardHeader className="p-0">
@@ -70,14 +120,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) =
             </CardTitle>
           </div>
           <div className="absolute top-4 right-4 flex gap-2 no-print">
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => onToggleFavorite(recipe)}
-              aria-label={isFavorite ? "ដកចេញពីចំណូលចិត្ត" : "បន្ថែមទៅចំណូលចិត្ត"}
-            >
-              <Heart className={`h-5 w-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-primary"}`} />
-            </Button>
+            {isFavorite && showRemoveConfirm ? <RemoveFavoriteButton /> : <FavoriteButton />}
             <Button
               variant="secondary"
               size="icon"

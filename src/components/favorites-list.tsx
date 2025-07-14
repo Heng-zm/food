@@ -1,9 +1,8 @@
 "use client";
 
-import { Heart, ChefHat } from "lucide-react";
+import { Heart } from "lucide-react";
 import Image from "next/image";
 
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -57,7 +56,7 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
               </div>
             </div>
           </DialogTrigger>
-          <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto p-0">
+          <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
              <DialogHeader className="sr-only">
                 <DialogTitle>{recipe.recipeName}</DialogTitle>
              </DialogHeader>
@@ -65,6 +64,7 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
                 recipe={recipe}
                 isFavorite={true}
                 onToggleFavorite={onToggleFavorite}
+                showRemoveConfirm={true}
              />
           </DialogContent>
         </Dialog>
