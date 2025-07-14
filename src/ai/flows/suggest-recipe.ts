@@ -12,6 +12,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { generateRecipeImage } from './generate-recipe-image';
 
 const SuggestRecipeInputSchema = z.object({
   ingredients: z
@@ -42,7 +43,13 @@ export async function suggestRecipe(input: SuggestRecipeInput): Promise<SuggestR
 const recipePrompt = ai.definePrompt({
   name: 'recipePrompt',
   input: {schema: SuggestRecipeInputSchema},
-  output: {schema: SuggestRecipeOutputSchema},
+  output: {schema: z.object({
+    recipeName: z.string().describe('The name of the suggested recipe.'),
+    ingredients: z.string().describe('A list of ingredients required for the recipe.'),
+    instructions: z.string().describe('Step-by-step instructions for preparing the recipe.'),
+    estimatedCookingTime: z.string().describe('Estimated cooking time (e.g., 30 minutes).'),
+    nutritionalInformation: z.string().describe('Nutritional information for the recipe.'),
+  })},
   prompt: `You are a world-class chef specializing in creating delicious recipes based on available ingredients and cuisine preferences.
 
   Based on the ingredients and cuisine provided, suggest a detailed recipe including:
@@ -65,7 +72,19 @@ const suggestRecipeFlow = ai.defineFlow(
     outputSchema: SuggestRecipeOutputSchema,
   },
   async input => {
-    const {output} = await recipePrompt(input);
-    return output!;
+    const [recipeDetails, image] = await Promise.all([
+      (async () => {
+        const {output} = await recipePrompt(input);
+        return output!;
+      })(),
+      generateRecipeImage({recipeName: 'a delicious meal'})
+    ]);
+    
+    const {imageUrl} = await generateRecipeImage({recipeName: recipeDetails.recipeName});
+
+    return {
+      ...recipeDetails,
+      imageUrl: imageUrl,
+    };
   }
 );
