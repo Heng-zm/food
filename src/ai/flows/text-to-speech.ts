@@ -67,7 +67,7 @@ const textToSpeechFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Echo' }, // Using a common voice
+            prebuiltVoiceConfig: { voiceName: 'Algenib' },
           },
         },
       },
