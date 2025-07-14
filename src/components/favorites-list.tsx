@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import RecipeCard from "@/components/recipe-card";
@@ -56,6 +58,9 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
             </div>
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto p-0">
+             <DialogHeader className="sr-only">
+                <DialogTitle>{recipe.recipeName}</DialogTitle>
+             </DialogHeader>
              <RecipeCard 
                 recipe={recipe}
                 isFavorite={true}
