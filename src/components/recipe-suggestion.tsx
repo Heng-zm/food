@@ -26,10 +26,10 @@ import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
 
 const formSchema = z.object({
   ingredients: z.string().min(3, {
-    message: "Please enter at least one ingredient.",
+    message: "សូម​បញ្ចូល​គ្រឿង​ផ្សំ​យ៉ាង​ហោច​ណាស់​មួយ។",
   }),
   cuisine: z.string().min(2, {
-    message: "Cuisine must be at least 2 characters.",
+    message: "ប្រភេទម្ហូបត្រូវតែមានយ៉ាងហោចណាស់ 2 តួអក្សរ។",
   }),
   dietaryRestrictions: z.string().optional(),
 });
@@ -64,8 +64,8 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     } else {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: result.error || "There was a problem with your request.",
+        title: "មានបញ្ហាអ្វីមួយកើតឡើង!",
+        description: result.error || "មានបញ្ហាជាមួយសំណើរបស់អ្នក។",
       });
     }
   }
@@ -96,10 +96,10 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                   name="ingredients"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Available Ingredients</FormLabel>
+                      <FormLabel>គ្រឿងផ្សំដែលមាន</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="e.g., chicken breast, tomatoes, onion, garlic"
+                          placeholder="ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស"
                           {...field}
                         />
                       </FormControl>
@@ -113,9 +113,9 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                     name="cuisine"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Desired Cuisine</FormLabel>
+                        <FormLabel>ប្រភេទម្ហូបที่ต้องการ</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Italian, Mexican, Indian" {...field} />
+                          <Input placeholder="ឧ., ខ្មែរ, អ៊ីតាលី, ឥណ្ឌា" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -126,9 +126,9 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                     name="dietaryRestrictions"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Dietary Restrictions (optional)</FormLabel>
+                        <FormLabel>ការរឹតបន្តឹងរបបអាហារ (ស្រេចចិត្ត)</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Vegetarian, Gluten-Free" {...field} />
+                          <Input placeholder="ឧ., បួស, គ្មានជាតិស្អិត" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -140,10 +140,10 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
+                    កំពុងបង្កើត...
                   </>
                 ) : (
-                  "Suggest Recipe"
+                  "ណែនាំរូបមន្ត"
                 )}
               </Button>
             </form>

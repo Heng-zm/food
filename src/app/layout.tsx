@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "GourmandAI",
-  description: "AI-powered recipe suggestions based on your ingredients.",
+  title: "GourmandAI | ចុងភៅ AI",
+  description: "ការណែនាំរូបមន្តដែលដំណើរការដោយ AI ដោយផ្អែកលើគ្រឿងផ្សំរបស់អ្នក។",
 };
 
 export default function RootLayout({
@@ -13,11 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="km" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
         {children}

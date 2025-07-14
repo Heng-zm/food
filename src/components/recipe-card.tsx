@@ -50,7 +50,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) =
               variant="secondary"
               size="icon"
               onClick={() => onToggleFavorite(recipe)}
-              aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              aria-label={isFavorite ? "ដកចេញពីចំណូលចិត្ត" : "បន្ថែមទៅចំណូលចិត្ត"}
             >
               <Heart className={`h-5 w-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-primary"}`} />
             </Button>
@@ -58,7 +58,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) =
               variant="secondary"
               size="icon"
               onClick={handlePrint}
-              aria-label="Print recipe"
+              aria-label="បោះពុម្ពរូបមន្ត"
             >
               <Printer className="h-5 w-5 text-primary" />
             </Button>
@@ -87,7 +87,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) =
           <div>
             <h3 className="mb-4 flex items-center gap-2 font-headline text-xl font-bold">
               <UtensilsCrossed className="h-6 w-6 text-primary" />
-              Ingredients
+              គ្រឿងផ្សំ
             </h3>
             <ul className="space-y-2">
               {ingredientsList.map((ingredient, index) => (
@@ -101,7 +101,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) =
           <div>
             <h3 className="mb-4 flex items-center gap-2 font-headline text-xl font-bold">
               <BookOpen className="h-6 w-6 text-primary" />
-              Instructions
+              ការណែនាំ
             </h3>
             <ol className="space-y-4">
                {instructionsList.map((instruction, index) => (

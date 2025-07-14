@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['Alegreya', 'serif'],
-        headline: ['Alegreya', 'serif'],
+        body: ['"Noto Sans Khmer"', 'serif'],
+        headline: ['"Noto Sans Khmer"', 'serif'],
         code: ['monospace'],
       },
       colors: {

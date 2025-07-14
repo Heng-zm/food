@@ -40,7 +40,7 @@ export default function Home() {
           </h1>
         </div>
         <p className="max-w-2xl text-lg text-muted-foreground">
-          Turn your pantry staples into delightful meals. Tell us what you have, and we'll whip up a recipe just for you.
+          ប្រែក្លាយគ្រឿងផ្សំក្នុងផ្ទះបាយរបស់អ្នកទៅជាអាហារដ៏ឈ្ងុយឆ្ងាញ់។ ប្រាប់យើងពីអ្វីដែលអ្នកមាន ហើយយើងនឹងបង្កើតរូបមន្តសម្រាប់អ្នក។
         </p>
       </header>
 
@@ -48,11 +48,11 @@ export default function Home() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="suggestion">
             <ChefHat className="mr-2 h-4 w-4" />
-            Suggest Recipe
+            ណែនាំរូបមន្ត
           </TabsTrigger>
           <TabsTrigger value="favorites">
             <Heart className="mr-2 h-4 w-4" />
-            Favorites
+            ចំណូលចិត្ត
           </TabsTrigger>
         </TabsList>
         <TabsContent value="suggestion">

@@ -24,9 +24,9 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
           <Heart className="h-8 w-8 text-muted-foreground" />
         </div>
-        <h3 className="font-headline text-xl font-semibold">No Favorites Yet</h3>
+        <h3 className="font-headline text-xl font-semibold">មិនទាន់មានចំណូលចិត្ត</h3>
         <p className="mt-2 text-muted-foreground">
-          Your favorite recipes will appear here. Find a recipe you love and click the heart to save it!
+          រូបមន្តដែលអ្នកចូលចិត្តនឹងបង្ហាញនៅទីនេះ។ ស្វែងរករូបមន្តដែលអ្នកស្រលាញ់ ហើយចុចលើរូបបេះដូងដើម្បីរក្សាទុកវា!
         </p>
       </div>
     );

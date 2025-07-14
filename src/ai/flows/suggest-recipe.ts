@@ -17,22 +17,22 @@ import { generateRecipeImage } from './generate-recipe-image';
 const SuggestRecipeInputSchema = z.object({
   ingredients: z
     .string()
-    .describe('A comma-separated list of available ingredients.'),
-  cuisine: z.string().describe('The desired cuisine (e.g., Italian, Mexican).'),
+    .describe('បញ្ជីគ្រឿងផ្សំដែលមាន រាយដោយមានសញ្ញាក្បៀស។'),
+  cuisine: z.string().describe('ប្រភេទម្ហូបที่ต้องการ (ឧ. ខ្មែរ, អ៊ីតាលី)។'),
   dietaryRestrictions: z
     .string()
     .optional()
-    .describe('Any dietary restrictions or allergies (e.g., vegetarian, gluten-free).'),
+    .describe('ข้อจำกัดด้านอาหารหรือการแพ้อาหารใด ๆ (เช่น มังสวิรัติ, ปราศจากกลูเตน)'),
 });
 export type SuggestRecipeInput = z.infer<typeof SuggestRecipeInputSchema>;
 
 const SuggestRecipeOutputSchema = z.object({
-  recipeName: z.string().describe('The name of the suggested recipe.'),
-  ingredients: z.string().describe('A list of ingredients required for the recipe.'),
-  instructions: z.string().describe('Step-by-step instructions for preparing the recipe.'),
-  estimatedCookingTime: z.string().describe('Estimated cooking time (e.g., 30 minutes).'),
-  nutritionalInformation: z.string().describe('Nutritional information for the recipe.'),
-  imageUrl: z.string().optional().describe('URL of an image of the recipe.'),
+  recipeName: z.string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
+  ingredients: z.string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។'),
+  instructions: z.string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។'),
+  estimatedCookingTime: z.string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
+  nutritionalInformation: z.string().describe('ព័ត៌មានអាហារូបត្ថម្ភសម្រាប់រូបមន្ត។'),
+  imageUrl: z.string().optional().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
 });
 export type SuggestRecipeOutput = z.infer<typeof SuggestRecipeOutputSchema>;
 
@@ -44,24 +44,26 @@ const recipePrompt = ai.definePrompt({
   name: 'recipePrompt',
   input: {schema: SuggestRecipeInputSchema},
   output: {schema: z.object({
-    recipeName: z.string().describe('The name of the suggested recipe.'),
-    ingredients: z.string().describe('A list of ingredients required for the recipe.'),
-    instructions: z.string().describe('Step-by-step instructions for preparing the recipe.'),
-    estimatedCookingTime: z.string().describe('Estimated cooking time (e.g., 30 minutes).'),
-    nutritionalInformation: z.string().describe('Nutritional information for the recipe.'),
+    recipeName: z.string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
+    ingredients: z.string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។'),
+    instructions: z.string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។'),
+    estimatedCookingTime: z.string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
+    nutritionalInformation: z.string().describe('ព័ត៌មានអាហារូបត្ថម្ភសម្រាប់រូបមន្ត។'),
   })},
-  prompt: `You are a world-class chef specializing in creating delicious recipes based on available ingredients and cuisine preferences.
+  prompt: `អ្នកគឺជាចុងភៅលំដាប់ពិភពលោក ដែលមានជំនាញក្នុងការបង្កើតរូបមន្តឆ្ងាញ់ៗ ដោយផ្អែកលើគ្រឿងផ្សំដែលមាន និងចំណូលចិត្តម្ហូប។
 
-  Based on the ingredients and cuisine provided, suggest a detailed recipe including:
-  - Recipe Name
-  - Ingredients (with quantities)
-  - Step-by-step cooking instructions
-  - Estimated cooking time
-  - Nutritional information
+  សូមផ្តល់ការឆ្លើយតបទាំងមូលជាភាសាខ្មែរ (កម្ពុជា)។
 
-  Ingredients: {{{ingredients}}}
-  Cuisine: {{{cuisine}}}
-  Dietary Restrictions: {{#if dietaryRestrictions}}{{{dietaryRestrictions}}}{{else}}None{{/if}}
+  ដោយផ្អែកលើគ្រឿងផ្សំ និងម្ហូបដែលបានផ្តល់ សូមណែនាំរូបមន្តលម្អិត រួមទាំង៖
+  - ឈ្មោះ​រូបមន្ត
+  - គ្រឿងផ្សំ (ជាមួយបរិមាណ)
+  - ការណែនាំអំពីការចម្អិនអាហារមួយជំហានម្តង ៗ
+  - ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន
+  - ព័ត៌មានអាហារូបត្ថម្ភ
+
+  គ្រឿងផ្សំ៖ {{{ingredients}}}
+  ម្ហូប៖ {{{cuisine}}}
+  ការរឹតបន្តឹងរបបអាហារ៖ {{#if dietaryRestrictions}}{{{dietaryRestrictions}}}{{else}}គ្មាន{{/if}}
 `,
 });
 
