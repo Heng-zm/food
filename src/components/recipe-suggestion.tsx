@@ -55,12 +55,19 @@ const cuisineOptions = [
   "បារាំង",
 ];
 
-const recommendedDishes = [
+const allRecommendedDishes = [
     "សម្លរកកូរ",
     "អាម៉ុកត្រី",
     "គុយទាវ",
     "សម្លរម្ជូរគ្រឿងសាច់គោ",
     "ឆាក្តៅសាច់មាន់",
+    "បាយសាច់ជ្រូក",
+    "ឡុកឡាក់សាច់គោ",
+    "ការីសាច់មាន់",
+    "សម្លរម្ជូរយួន",
+    "ឆាខ្ញីសាច់មាន់",
+    "ត្រីចៀនជូរអែម",
+    "ខសាច់ជ្រូក",
 ];
 
 
@@ -81,8 +88,13 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   });
 
   const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
+  const [recommendedDishes, setRecommendedDishes] = useState<string[]>([]);
 
   useEffect(() => {
+    // Randomize dishes on client-side to avoid hydration mismatch
+    const shuffled = [...allRecommendedDishes].sort(() => 0.5 - Math.random());
+    setRecommendedDishes(shuffled.slice(0, 5));
+
     const supported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
     setIsSpeechRecognitionSupported(supported);
@@ -90,22 +102,22 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     if (!supported) return;
   
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = false;
-    recognitionRef.current.lang = 'km-KH';
-    recognitionRef.current.interimResults = false;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = 'km-KH';
+    recognition.interimResults = false;
   
-    recognitionRef.current.onstart = () => {
+    recognition.onstart = () => {
       setIsListening(true);
     };
   
-    recognitionRef.current.onresult = (event: any) => {
+    recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       const currentIngredients = form.getValues("ingredients");
       form.setValue("ingredients", currentIngredients ? `${currentIngredients}, ${transcript}` : transcript);
     };
   
-    recognitionRef.current.onerror = (event: any) => {
+    recognition.onerror = (event: any) => {
       console.error("Speech recognition error", event.error);
       let errorMessage = "មិនអាចដំណើរការការបញ្ចូលដោយសំឡេងបានទេ។ សូមព្យាយាមម្តងទៀត។";
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
@@ -119,9 +131,11 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
       setIsListening(false);
     };
   
-    recognitionRef.current.onend = () => {
+    recognition.onend = () => {
       setIsListening(false);
     };
+
+    recognitionRef.current = recognition;
   
     return () => {
       if (recognitionRef.current) {
@@ -141,7 +155,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     }
     if (isListening) {
       recognitionRef.current.stop();
-      setIsListening(false);
     } else {
       try {
         recognitionRef.current.start();
