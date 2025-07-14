@@ -45,10 +45,12 @@ export async function suggestRecipe(input: SuggestRecipeInput): Promise<SuggestR
 const recipePrompt = ai.definePrompt({
   name: 'recipePrompt',
   input: {schema: SuggestRecipeInputSchema},
-  output: {schema: z.object({
+  output: {
+    format: 'json',
+    schema: z.object({
     recipeName: z.string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
-    ingredients: z.string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។'),
-    instructions: z.string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។'),
+    ingredients: z.string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។ បំបែកធាតុនីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
+    instructions: z.string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។ បំបែកជំហាននីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
     estimatedCookingTime: z.string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
     nutritionalInformation: z.string().describe('ព័ត៌មានអាហារូបត្ថម្ភសម្រាប់រូបមន្ត។'),
   })},
@@ -56,16 +58,13 @@ const recipePrompt = ai.definePrompt({
 
   សូមផ្តល់ការឆ្លើយតបទាំងមូលជាភាសាខ្មែរ (កម្ពុជា)។
 
-  ដោយផ្អែកលើគ្រឿងផ្សំ និងម្ហូបដែលបានផ្តល់ សូមណែនាំរូបមន្តលម្អិត រួមទាំង៖
-  - ឈ្មោះ​រូបមន្ត
-  - គ្រឿងផ្សំ (ជាមួយបរិមាណ)
-  - ការណែនាំអំពីការចម្អិនអាហារមួយជំហានម្តង ៗ
-  - ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន
-  - ព័ត៌មានអាហារូបត្ថម្ភ
+  ដោយផ្អែកលើគ្រឿងផ្សំ និងម្ហូបដែលបានផ្តល់ សូមណែនាំរូបមន្តលម្អិត។
 
   គ្រឿងផ្សំ៖ {{{ingredients}}}
   ម្ហូប៖ {{{cuisine}}}
   ការរឹតបន្តឹងរបបអាហារ៖ {{#if dietaryRestrictions}}{{{dietaryRestrictions}}}{{else}}គ្មាន{{/if}}
+
+  ត្រូវប្រាកដថាការឆ្លើយតបរបស់អ្នកជាទម្រង់ JSON ដែលអាចញែកបាន។
 `,
 });
 
