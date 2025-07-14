@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['"Noto Sans Khmer"', 'serif'],
-        headline: ['"Noto Sans Khmer"', 'serif'],
+        body: ['"Kantumruy Pro"', 'serif'],
+        headline: ['"Kantumruy Pro"', 'serif'],
         code: ['monospace'],
       },
       colors: {
