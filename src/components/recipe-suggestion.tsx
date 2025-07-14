@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RecipeCard from "@/components/recipe-card";
 import { getRecipeSuggestion } from "@/app/actions";
 import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
@@ -29,7 +30,7 @@ const formSchema = z.object({
     message: "សូម​បញ្ចូល​គ្រឿង​ផ្សំ​យ៉ាង​ហោច​ណាស់​មួយ។",
   }),
   cuisine: z.string().min(2, {
-    message: "ប្រភេទម្ហូបត្រូវតែមានយ៉ាងហោចណាស់ 2 តួអក្សរ។",
+    message: "សូមជ្រើសរើសប្រភេទម្ហូប។",
   }),
   dietaryRestrictions: z.string().optional(),
 });
@@ -38,6 +39,19 @@ interface RecipeSuggestionProps {
   favorites: SuggestRecipeOutput[];
   onToggleFavorite: (recipe: SuggestRecipeOutput) => void;
 }
+
+const cuisineOptions = [
+  "ខ្មែរ",
+  "ថៃ",
+  "វៀតណាម",
+  "ចិន",
+  "ជប៉ុន",
+  "កូរ៉េ",
+  "ឥណ្ឌា",
+  "អ៊ីតាលី",
+  "ម៉ិកស៊ិក",
+  "បារាំង",
+];
 
 const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -114,9 +128,20 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>ប្រភេទម្ហូប</FormLabel>
-                        <FormControl>
-                          <Input placeholder="ឧ., ខ្មែរ, អ៊ីតាលី, ឥណ្ឌា" {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="ជ្រើសរើសប្រភេទម្ហូប" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {cuisineOptions.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
