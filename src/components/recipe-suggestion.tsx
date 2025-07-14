@@ -80,13 +80,14 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     },
   });
 
-  const isSpeechRecognitionSupported =
-    typeof window !== 'undefined' &&
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-
+  const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
 
   useEffect(() => {
-    if (!isSpeechRecognitionSupported) return;
+    const supported = typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+    setIsSpeechRecognitionSupported(supported);
+
+    if (!supported) return;
   
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognitionRef.current = new SpeechRecognition();
@@ -127,7 +128,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
         recognitionRef.current.stop();
       }
     };
-  }, [isSpeechRecognitionSupported, form, toast]);
+  }, [form, toast]);
 
   const toggleListening = () => {
     if (!isSpeechRecognitionSupported) {
@@ -333,5 +334,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 };
 
 export default RecipeSuggestion;
+
+    
 
     
