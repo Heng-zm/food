@@ -72,6 +72,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedRecipe, setSuggestedRecipe] = useState<SuggestRecipeOutput | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
   const { toast } = useToast();
   const recognitionRef = useRef<any>(null);
 
@@ -88,6 +89,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
+        setIsSpeechRecognitionSupported(true);
         recognitionRef.current = new SpeechRecognition();
         recognitionRef.current.continuous = false;
         recognitionRef.current.lang = 'km-KH';
@@ -114,18 +116,21 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
             title: "បញ្ហាក្នុងការស្គាល់សំឡេង",
             description: errorMessage,
           });
+          setIsListening(false);
         };
         
         recognitionRef.current.onend = () => {
           setIsListening(false);
         };
 
+      } else {
+        setIsSpeechRecognitionSupported(false);
       }
     }
   }, [form, toast]);
 
   const toggleListening = () => {
-    if (!recognitionRef.current) {
+    if (!isSpeechRecognitionSupported) {
        toast({
         variant: "destructive",
         title: "មុខងារមិនគាំទ្រ",
@@ -135,17 +140,24 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     }
     if (isListening) {
       recognitionRef.current.stop();
-      setIsListening(false);
     } else {
       try {
         recognitionRef.current.start();
       } catch (e) {
         console.error("Could not start recognition", e);
-        toast({
-            variant: "destructive",
-            title: "បញ្ហាក្នុងការចាប់ផ្តើម",
-            description: "មិនអាចចាប់ផ្តើមការស្តាប់បានទេ។ សូមព្យាយាមម្តងទៀត។",
-        });
+        if (e instanceof DOMException && e.name === 'NotAllowedError') {
+             toast({
+                variant: "destructive",
+                title: "ការចូលប្រើមីក្រូហ្វូនត្រូវបានបដិសេធ",
+                description: "សូមអនុញ្ញាតឱ្យប្រើមីក្រូហ្វូននៅក្នុងការកំណត់កម្មវិធីរុករករបស់អ្នក។",
+            });
+        } else {
+            toast({
+                variant: "destructive",
+                title: "បញ្ហាក្នុងការចាប់ផ្តើម",
+                description: "មិនអាចចាប់ផ្តើមការស្តាប់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+            });
+        }
         setIsListening(false);
       }
     }
@@ -217,6 +229,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                           onClick={toggleListening}
                           className="absolute bottom-2 right-2"
                           aria-label={isListening ? 'បញ្ឈប់ការស្តាប់' : 'ចាប់ផ្តើមការស្តាប់'}
+                          disabled={!isSpeechRecognitionSupported}
                         >
                           {isListening ? (
                             <MicOff className="h-5 w-5 text-red-500 animate-pulse" />
