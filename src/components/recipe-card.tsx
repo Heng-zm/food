@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Volume2, Loader2, Trash2, Play, Pause } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Play, Pause, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
+import type { Recipe } from "@/ai/flows/suggest-recipe";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,20 +21,29 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface RecipeCardProps {
-  recipe: SuggestRecipeOutput;
+  recipe: Recipe;
   isFavorite: boolean;
-  onToggleFavorite: (recipe: SuggestRecipeOutput) => void;
+  onToggleFavorite: (recipe: Recipe) => void;
   showRemoveConfirm?: boolean;
 }
 
 const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false }: RecipeCardProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audio] = useState(() => (typeof Audio !== 'undefined' && recipe.audioUrl) ? new Audio(recipe.audioUrl) : null);
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
-  if (audio) {
-    audio.onended = () => setIsPlaying(false);
-  }
+  useEffect(() => {
+    if (recipe.audioUrl) {
+      const audioInstance = new Audio(recipe.audioUrl);
+      audioInstance.onended = () => setIsPlaying(false);
+      setAudio(audioInstance);
+
+      return () => {
+        audioInstance.pause();
+        setAudio(null);
+      };
+    }
+  }, [recipe.audioUrl]);
 
   const handlePrint = () => {
     window.print();
@@ -59,7 +68,14 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
       audio.pause();
       setIsPlaying(false);
     } else {
-      audio.play();
+      audio.play().catch(e => {
+        console.error("Error playing audio:", e);
+        toast({
+          variant: "destructive",
+          title: "បញ្ហាក្នុងការចាក់សំឡេង",
+          description: "មិនអាចចាក់ឯកសារអូឌីយ៉ូបានទេ។ សូមព្យាយាមម្តងទៀត។",
+        });
+      });
       setIsPlaying(true);
     }
   };
@@ -107,13 +123,13 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   );
 
   return (
-    <Card className="w-full overflow-hidden printable-area">
+    <div className="w-full overflow-hidden printable-area">
       <CardHeader className="p-0">
         <div className="relative h-64 w-full">
           <Image
             src={recipe.imageUrl || "https://placehold.co/600x400/C45720/F5F5DC"}
             alt={recipe.recipeName}
-            layout="fill"
+            fill
             objectFit="cover"
             data-ai-hint="gourmet food"
             className="bg-muted"
@@ -204,7 +220,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
           </div>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 };
 

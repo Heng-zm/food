@@ -5,9 +5,13 @@
 /**
  * @fileOverview Recipe suggestion flow.
  *
- * - suggestRecipe - A function that suggests a recipe based on available ingredients and desired cuisine.
+ * - suggestRecipe - A function that suggests recipes based on available ingredients and desired cuisine.
+ * - getRecipeDetails - A function that gets the image and audio for a specific recipe.
  * - SuggestRecipeInput - The input type for the suggestRecipe function.
+ * - Recipe - A single recipe object.
  * - SuggestRecipeOutput - The return type for the suggestRecipe function.
+ * - GetRecipeDetailsInput - The input type for the getRecipeDetails function.
+ * - GetRecipeDetailsOutput - The return type for the getRecipeDetails function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -27,14 +31,19 @@ const SuggestRecipeInputSchema = z.object({
 });
 export type SuggestRecipeInput = z.infer<typeof SuggestRecipeInputSchema>;
 
-const SuggestRecipeOutputSchema = z.object({
+const RecipeSchema = z.object({
   recipeName: z.string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
-  ingredients: z.string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។'),
-  instructions: z.string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។'),
+  ingredients: z.string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។ បំបែកធាតុនីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
+  instructions: z.string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។ បំបែកជំហាននីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
   estimatedCookingTime: z.string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
   nutritionalInformation: z.string().describe('ព័ត៌មានអាហារូបត្ថម្ភសម្រាប់រូបមន្ត។'),
   imageUrl: z.string().optional().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
   audioUrl: z.string().optional().describe("URL ទិន្នន័យនៃសំឡេងនៃការណែនាំ។"),
+});
+export type Recipe = z.infer<typeof RecipeSchema>;
+
+const SuggestRecipeOutputSchema = z.object({
+  recipes: z.array(RecipeSchema.omit({ imageUrl: true, audioUrl: true })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ។'),
 });
 export type SuggestRecipeOutput = z.infer<typeof SuggestRecipeOutputSchema>;
 
@@ -47,24 +56,19 @@ const recipePrompt = ai.definePrompt({
   input: {schema: SuggestRecipeInputSchema},
   output: {
     format: 'json',
-    schema: z.object({
-    recipeName: z.string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
-    ingredients: z.string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។ បំបែកធាតុនីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
-    instructions: z.string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។ បំបែកជំហាននីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
-    estimatedCookingTime: z.string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
-    nutritionalInformation: z.string().describe('ព័ត៌មានអាហារូបត្ថម្ភសម្រាប់រូបមន្ត។'),
-  })},
+    schema: SuggestRecipeOutputSchema,
+  },
   prompt: `អ្នកគឺជាចុងភៅលំដាប់ពិភពលោក ដែលមានជំនាញក្នុងការបង្កើតរូបមន្តឆ្ងាញ់ៗ ដោយផ្អែកលើគ្រឿងផ្សំដែលមាន និងចំណូលចិត្តម្ហូប។
 
   សូមផ្តល់ការឆ្លើយតបទាំងមូលជាភាសាខ្មែរ (កម្ពុជា)។
 
-  ដោយផ្អែកលើគ្រឿងផ្សំ និងម្ហូបដែលបានផ្តល់ សូមណែនាំរូបមន្តលម្អិត។
+  ដោយផ្អែកលើគ្រឿងផ្សំ និងម្ហូបដែលបានផ្តល់ សូមណែនាំរូបមន្តលម្អិតចំនួន 5 ។
 
   គ្រឿងផ្សំ៖ {{{ingredients}}}
   ម្ហូប៖ {{{cuisine}}}
   ការរឹតបន្តឹងរបបអាហារ៖ {{#if dietaryRestrictions}}{{{dietaryRestrictions}}}{{else}}គ្មាន{{/if}}
 
-  ត្រូវប្រាកដថាការឆ្លើយតបរបស់អ្នកជាទម្រង់ JSON ដែលអាចញែកបាន។
+  ត្រូវប្រាកដថាការឆ្លើយតបរបស់អ្នកជាទម្រង់ JSON ដែលអាចញែកបាន ដែលគោរពតាម schema ដែលបានផ្តល់ឱ្យ។
 `,
 });
 
@@ -75,18 +79,43 @@ const suggestRecipeFlow = ai.defineFlow(
     outputSchema: SuggestRecipeOutputSchema,
   },
   async input => {
-    const recipeDetails = await (async () => {
-        const {output} = await recipePrompt(input);
-        return output!;
-    })();
-    
+    const {output} = await recipePrompt(input);
+    return output!;
+  }
+);
+
+
+// Flow to get details (image, audio) for a single recipe
+const GetRecipeDetailsInputSchema = z.object({
+  recipeName: z.string(),
+  instructions: z.string(),
+});
+export type GetRecipeDetailsInput = z.infer<typeof GetRecipeDetailsInputSchema>;
+
+const GetRecipeDetailsOutputSchema = z.object({
+  imageUrl: z.string().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
+  audioUrl: z.string().describe("URL ទិន្នន័យនៃសំឡេងនៃការណែនាំ។"),
+});
+export type GetRecipeDetailsOutput = z.infer<typeof GetRecipeDetailsOutputSchema>;
+
+
+export async function getRecipeDetails(input: GetRecipeDetailsInput): Promise<GetRecipeDetailsOutput> {
+  return getRecipeDetailsFlow(input);
+}
+
+const getRecipeDetailsFlow = ai.defineFlow(
+  {
+    name: 'getRecipeDetailsFlow',
+    inputSchema: GetRecipeDetailsInputSchema,
+    outputSchema: GetRecipeDetailsOutputSchema,
+  },
+  async ({ recipeName, instructions }) => {
     const [imageResult, audioResult] = await Promise.all([
-      generateRecipeImage({recipeName: recipeDetails.recipeName}),
-      textToSpeech({text: `ការណែនាំ៖\n${recipeDetails.instructions}`})
+      generateRecipeImage({recipeName: recipeName}),
+      textToSpeech({text: `ការណែនាំ៖\n${instructions}`})
     ]);
 
     return {
-      ...recipeDetails,
       imageUrl: imageResult.imageUrl,
       audioUrl: audioResult.audioUrl,
     };

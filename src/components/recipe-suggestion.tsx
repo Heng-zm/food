@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Mic, MicOff, Sparkles } from "lucide-react";
+import { Loader2, Mic, MicOff, Sparkles, ChefHat, ChevronRight, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -23,9 +23,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RecipeCard from "@/components/recipe-card";
-import { getRecipeSuggestion } from "@/app/actions";
-import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
+import { getRecipeSuggestion, getRecipeDetailsAction } from "@/app/actions";
+import type { Recipe } from "@/ai/flows/suggest-recipe";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const formSchema = z.object({
   ingredients: z.string().min(3, {
@@ -38,8 +45,8 @@ const formSchema = z.object({
 });
 
 interface RecipeSuggestionProps {
-  favorites: SuggestRecipeOutput[];
-  onToggleFavorite: (recipe: SuggestRecipeOutput) => void;
+  favorites: Recipe[];
+  onToggleFavorite: (recipe: Recipe) => void;
 }
 
 const cuisineOptions = [
@@ -70,10 +77,11 @@ const allRecommendedDishes = [
     "ខសាច់ជ្រូក",
 ];
 
-
 const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [suggestedRecipe, setSuggestedRecipe] = useState<SuggestRecipeOutput | null>(null);
+  const [isFetchingDetails, setIsFetchingDetails] = useState(false);
+  const [suggestedRecipes, setSuggestedRecipes] = useState<Recipe[] | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
@@ -102,22 +110,22 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     if (!supported) return;
   
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.lang = 'km-KH';
-    recognition.interimResults = false;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.continuous = false;
+    recognitionRef.current.lang = 'km-KH';
+    recognitionRef.current.interimResults = false;
   
-    recognition.onstart = () => {
+    recognitionRef.current.onstart = () => {
       setIsListening(true);
     };
   
-    recognition.onresult = (event: any) => {
+    recognitionRef.current.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       const currentIngredients = form.getValues("ingredients");
       form.setValue("ingredients", currentIngredients ? `${currentIngredients}, ${transcript}` : transcript);
     };
   
-    recognition.onerror = (event: any) => {
+    recognitionRef.current.onerror = (event: any) => {
       console.error("Speech recognition error", event.error);
       let errorMessage = "មិនអាចដំណើរការការបញ្ចូលដោយសំឡេងបានទេ។ សូមព្យាយាមម្តងទៀត។";
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
@@ -131,11 +139,9 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
       setIsListening(false);
     };
   
-    recognition.onend = () => {
+    recognitionRef.current.onend = () => {
       setIsListening(false);
     };
-
-    recognitionRef.current = recognition;
   
     return () => {
       if (recognitionRef.current) {
@@ -178,15 +184,15 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     }
   };
 
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    setSuggestedRecipe(null);
+    setSuggestedRecipes(null);
+    setSelectedRecipe(null);
     const result = await getRecipeSuggestion(values);
     setIsLoading(false);
 
     if (result.success && result.data) {
-      setSuggestedRecipe(result.data);
+      setSuggestedRecipes(result.data.recipes);
     } else {
       toast({
         variant: "destructive",
@@ -202,18 +208,47 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     form.handleSubmit(onSubmit)();
   };
 
+  const handleRecipeSelect = async (recipe: Recipe) => {
+    if (recipe.imageUrl && recipe.audioUrl) {
+      setSelectedRecipe(recipe);
+      return;
+    }
+
+    setIsFetchingDetails(true);
+    setSelectedRecipe(recipe); // Show text details immediately
+
+    const result = await getRecipeDetailsAction({
+      recipeName: recipe.recipeName,
+      instructions: recipe.instructions,
+    });
+    setIsFetchingDetails(false);
+
+    if (result.success && result.data) {
+      const fullRecipe = {
+        ...recipe,
+        imageUrl: result.data.imageUrl,
+        audioUrl: result.data.audioUrl,
+      };
+      setSelectedRecipe(fullRecipe);
+      // Update the list as well so we don't have to fetch again
+      setSuggestedRecipes(prev => 
+        prev?.map(r => r.recipeName === recipe.recipeName ? fullRecipe : r) || null
+      );
+    } else {
+       toast({
+        variant: "destructive",
+        title: "មិនអាចទាញយកព័ត៌មានលម្អិតបានទេ",
+        description: result.error || "មានបញ្ហាក្នុងការទាញយករូបភាព និងសំឡេងសម្រាប់រូបមន្តនេះ។",
+      });
+    }
+  };
+
   const LoadingSkeleton = () => (
-    <Card className="mt-8 w-full">
-      <CardContent className="p-6">
-        <Skeleton className="h-8 w-3/4 mb-4" />
-        <Skeleton className="h-6 w-1/2 mb-6" />
-        <div className="space-y-4">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
-        </div>
-      </CardContent>
-    </Card>
+    <div className="mt-8 space-y-4">
+      {[...Array(5)].map((_, i) => (
+        <Skeleton key={i} className="h-12 w-full" />
+      ))}
+    </div>
   );
 
   return (
@@ -334,12 +369,51 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 
       <div className="mt-8">
         {isLoading && <LoadingSkeleton />}
-        {suggestedRecipe && (
-          <RecipeCard
-            recipe={suggestedRecipe}
-            isFavorite={favorites.some(fav => fav.recipeName === suggestedRecipe.recipeName)}
-            onToggleFavorite={onToggleFavorite}
-          />
+        {suggestedRecipes && !selectedRecipe && (
+          <Card>
+            <CardContent className="p-4">
+              <h2 className="mb-4 font-headline text-xl font-bold">លទ្ធផលរូបមន្ត</h2>
+              <ul className="space-y-2">
+                {suggestedRecipes.map((recipe) => (
+                  <li key={recipe.recipeName}>
+                    <button
+                      onClick={() => handleRecipeSelect(recipe)}
+                      className="w-full text-left p-3 rounded-md hover:bg-muted transition-colors flex justify-between items-center"
+                    >
+                      <div className="flex items-center gap-3">
+                         <ChefHat className="h-5 w-5 text-primary" />
+                         <span>{recipe.recipeName}</span>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+        
+        {selectedRecipe && (
+           <Dialog open={!!selectedRecipe} onOpenChange={(open) => !open && setSelectedRecipe(null)}>
+            <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
+              <DialogHeader className="p-6 pb-0 flex flex-row items-center justify-between">
+                <DialogTitle>{selectedRecipe.recipeName}</DialogTitle>
+                {isFetchingDetails && <Loader2 className="h-5 w-5 animate-spin text-primary" />}
+              </DialogHeader>
+              <RecipeCard
+                recipe={selectedRecipe}
+                isFavorite={favorites.some(fav => fav.recipeName === selectedRecipe.recipeName)}
+                onToggleFavorite={onToggleFavorite}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {suggestedRecipes && selectedRecipe && (
+           <Button variant="outline" onClick={() => setSelectedRecipe(null)} className="mt-4">
+             <RefreshCw className="mr-2 h-4 w-4" />
+             ត្រលប់ទៅលទ្ធផល
+           </Button>
         )}
       </div>
     </div>
@@ -347,7 +421,3 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 };
 
 export default RecipeSuggestion;
-
-    
-
-    

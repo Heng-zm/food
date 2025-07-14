@@ -7,15 +7,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import RecipeSuggestion from "@/components/recipe-suggestion";
 import FavoritesList from "@/components/favorites-list";
-import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
+import type { Recipe } from "@/ai/flows/suggest-recipe";
 
 export default function Home() {
-  const [favorites, setFavorites] = useLocalStorage<SuggestRecipeOutput[]>(
+  const [favorites, setFavorites] = useLocalStorage<Recipe[]>(
     "gourmand-favorites",
     []
   );
 
-  const handleToggleFavorite = (recipe: SuggestRecipeOutput) => {
+  const handleToggleFavorite = (recipe: Recipe) => {
     setFavorites((prevFavorites) => {
       const isFavorited = prevFavorites.some(
         (fav) => fav.recipeName === recipe.recipeName

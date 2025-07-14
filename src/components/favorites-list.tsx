@@ -11,11 +11,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import RecipeCard from "@/components/recipe-card";
-import type { SuggestRecipeOutput } from "@/ai/flows/suggest-recipe";
+import type { Recipe } from "@/ai/flows/suggest-recipe";
 
 interface FavoritesListProps {
-  favorites: SuggestRecipeOutput[];
-  onToggleFavorite: (recipe: SuggestRecipeOutput) => void;
+  favorites: Recipe[];
+  onToggleFavorite: (recipe: Recipe) => void;
 }
 
 const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
@@ -43,7 +43,7 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
                 <Image
                   src={recipe.imageUrl || "https://placehold.co/400x300/C45720/F5F5DC"}
                   alt={recipe.recipeName}
-                  layout="fill"
+                  fill
                   objectFit="cover"
                   data-ai-hint="gourmet food"
                   className="transition-transform duration-300 group-hover:scale-105"
@@ -57,7 +57,7 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
             </div>
           </DialogTrigger>
           <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
-             <DialogHeader className="sr-only">
+             <DialogHeader className="p-6 pb-0">
                 <DialogTitle>{recipe.recipeName}</DialogTitle>
              </DialogHeader>
              <RecipeCard 
