@@ -17,7 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,7 +40,6 @@ const formSchema = z.object({
   cuisine: z.string().min(2, {
     message: "សូមជ្រើសរើសប្រភេទម្ហូប។",
   }),
-  dietaryRestrictions: z.string().optional(),
 });
 
 interface RecipeSuggestionProps {
@@ -85,18 +83,16 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
+  const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
+  const [recommendedDishes, setRecommendedDishes] = useState<string[]>([]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       ingredients: "",
       cuisine: "",
-      dietaryRestrictions: "",
     },
   });
-
-  const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
-  const [recommendedDishes, setRecommendedDishes] = useState<string[]>([]);
 
   useEffect(() => {
     // Randomize dishes on client-side to avoid hydration mismatch
@@ -106,26 +102,29 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     const supported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
     setIsSpeechRecognitionSupported(supported);
+  }, []);
 
-    if (!supported) return;
+  useEffect(() => {
+    if (!isSpeechRecognitionSupported) return;
   
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = false;
-    recognitionRef.current.lang = 'km-KH';
-    recognitionRef.current.interimResults = false;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = 'km-KH';
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
   
-    recognitionRef.current.onstart = () => {
+    recognition.onstart = () => {
       setIsListening(true);
     };
   
-    recognitionRef.current.onresult = (event: any) => {
+    recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       const currentIngredients = form.getValues("ingredients");
       form.setValue("ingredients", currentIngredients ? `${currentIngredients}, ${transcript}` : transcript);
     };
   
-    recognitionRef.current.onerror = (event: any) => {
+    recognition.onerror = (event: any) => {
       console.error("Speech recognition error", event.error);
       let errorMessage = "មិនអាចដំណើរការការបញ្ចូលដោយសំឡេងបានទេ។ សូមព្យាយាមម្តងទៀត។";
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
@@ -139,7 +138,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
       setIsListening(false);
     };
   
-    recognitionRef.current.onend = () => {
+    recognition.onend = () => {
       setIsListening(false);
     };
   
@@ -148,7 +147,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
         recognitionRef.current.stop();
       }
     };
-  }, [form, toast]);
+  }, [form, toast, isSpeechRecognitionSupported]);
 
   const toggleListening = () => {
     if (!isSpeechRecognitionSupported) {
@@ -313,19 +312,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="dietaryRestrictions"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ការរឹតបន្តឹងរបបអាហារ (ស្រេចចិត្ត)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="ឧ., បួស, គ្មានជាតិស្អិត" {...field} />
-                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

@@ -24,10 +24,6 @@ const SuggestRecipeInputSchema = z.object({
     .string()
     .describe('បញ្ជីគ្រឿងផ្សំដែលមាន រាយដោយមានសញ្ញាក្បៀស។'),
   cuisine: z.string().describe('ប្រភេទម្ហូបដែលចង់បាន (ឧ. ខ្មែរ, អ៊ីតាលី)។'),
-  dietaryRestrictions: z
-    .string()
-    .optional()
-    .describe('ការរឹតបន្តឹង ឬអាឡែរហ្ស៊ីលើរបបអាហារណាមួយ (ឧ. បួស, គ្មានជាតិស្អិត gluten)'),
 });
 export type SuggestRecipeInput = z.infer<typeof SuggestRecipeInputSchema>;
 
@@ -66,7 +62,6 @@ const recipePrompt = ai.definePrompt({
 
   គ្រឿងផ្សំ៖ {{{ingredients}}}
   ម្ហូប៖ {{{cuisine}}}
-  ការរឹតបន្តឹងរបបអាហារ៖ {{#if dietaryRestrictions}}{{{dietaryRestrictions}}}{{else}}គ្មាន{{/if}}
 
   ត្រូវប្រាកដថាការឆ្លើយតបរបស់អ្នកជាទម្រង់ JSON ដែលអាចញែកបាន ដែលគោរពតាម schema ដែលបានផ្តល់ឱ្យ។
 `,
