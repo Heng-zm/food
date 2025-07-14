@@ -105,10 +105,9 @@ const getRecipeDetailsFlow = ai.defineFlow(
     outputSchema: GetRecipeDetailsOutputSchema,
   },
   async ({ recipeName, instructions }) => {
-    const [imageResult, audioResult] = await Promise.all([
-      generateRecipeImage({recipeName: recipeName}),
-      textToSpeech({text: `ការណែនាំ៖\n${instructions}`})
-    ]);
+    // Generate image and audio sequentially to avoid rate limiting.
+    const imageResult = await generateRecipeImage({recipeName: recipeName});
+    const audioResult = await textToSpeech({text: `ការណែនាំ៖\n${instructions}`});
 
     return {
       imageUrl: imageResult.imageUrl,
