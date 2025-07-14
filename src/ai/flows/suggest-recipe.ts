@@ -18,11 +18,11 @@ const SuggestRecipeInputSchema = z.object({
   ingredients: z
     .string()
     .describe('បញ្ជីគ្រឿងផ្សំដែលមាន រាយដោយមានសញ្ញាក្បៀស។'),
-  cuisine: z.string().describe('ប្រភេទម្ហូបที่ต้องการ (ឧ. ខ្មែរ, អ៊ីតាលី)។'),
+  cuisine: z.string().describe('ប្រភេទម្ហូបដែលចង់បាន (ឧ. ខ្មែរ, អ៊ីតាលី)។'),
   dietaryRestrictions: z
     .string()
     .optional()
-    .describe('ข้อจำกัดด้านอาหารหรือการแพ้อาหารใด ๆ (เช่น มังสวิรัติ, ปราศจากกลูเตน)'),
+    .describe('ការរឹតបន្តឹង ឬអាឡែរហ្ស៊ីលើរបបអាហារណាមួយ (ឧ. បួស, គ្មានជាតិស្អិត gluten)'),
 });
 export type SuggestRecipeInput = z.infer<typeof SuggestRecipeInputSchema>;
 
@@ -74,13 +74,10 @@ const suggestRecipeFlow = ai.defineFlow(
     outputSchema: SuggestRecipeOutputSchema,
   },
   async input => {
-    const [recipeDetails, image] = await Promise.all([
-      (async () => {
+    const recipeDetails = await (async () => {
         const {output} = await recipePrompt(input);
         return output!;
-      })(),
-      generateRecipeImage({recipeName: 'a delicious meal'})
-    ]);
+    })();
     
     const {imageUrl} = await generateRecipeImage({recipeName: recipeDetails.recipeName});
 

@@ -113,7 +113,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                     name="cuisine"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>ប្រភេទម្ហូបที่ต้องการ</FormLabel>
+                        <FormLabel>ប្រភេទម្ហូប</FormLabel>
                         <FormControl>
                           <Input placeholder="ឧ., ខ្មែរ, អ៊ីតាលី, ឥណ្ឌា" {...field} />
                         </FormControl>
