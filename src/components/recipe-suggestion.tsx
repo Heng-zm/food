@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -57,14 +58,9 @@ const cuisineOptions = [
 const recommendedDishes = [
     "សម្លរកកូរ",
     "អាម៉ុកត្រី",
-    "ក๋วยเตี๋ยว (គុយទាវ)",
+    "គុយទាវ",
     "សម្លរម្ជូរគ្រឿងសាច់គោ",
     "ឆាក្តៅសាច់មាន់",
-    "ឡុកឡាក់សាច់គោ",
-    "បាយសាច់ជ្រូក",
-    "សម្លរការីសាច់មាន់",
-    "ឆាខ្ញីសាច់មាន់",
-    "ត្រីអាំងអំបិលម្ទេស",
 ];
 
 
@@ -72,10 +68,9 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedRecipe, setSuggestedRecipe] = useState<SuggestRecipeOutput | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
-  const { toast } = useToast();
   const recognitionRef = useRef<any>(null);
-
+  const { toast } = useToast();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -85,49 +80,54 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     },
   });
 
+  const isSpeechRecognitionSupported =
+    typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        setIsSpeechRecognitionSupported(true);
-        recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = false;
-        recognitionRef.current.lang = 'km-KH';
-        recognitionRef.current.interimResults = false;
-
-        recognitionRef.current.onstart = () => {
-          setIsListening(true);
-        };
-
-        recognitionRef.current.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript;
-          const currentIngredients = form.getValues("ingredients");
-          form.setValue("ingredients", currentIngredients ? `${currentIngredients}, ${transcript}`: transcript);
-        };
-
-        recognitionRef.current.onerror = (event: any) => {
-          console.error("Speech recognition error", event.error);
-          let errorMessage = "មិនអាចដំណើរការការបញ្ចូលដោយសំឡេងបានទេ។ សូមព្យាយាមម្តងទៀត។";
-          if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-            errorMessage = "ការចូលប្រើមីក្រូហ្វូនត្រូវបានបដិសេធ។ សូមអនុញ្ញាតឱ្យប្រើមីក្រូហ្វូននៅក្នុងការកំណត់កម្មវិធីរុករករបស់អ្នក។";
-          }
-          toast({
-            variant: "destructive",
-            title: "បញ្ហាក្នុងការស្គាល់សំឡេង",
-            description: errorMessage,
-          });
-          setIsListening(false);
-        };
-        
-        recognitionRef.current.onend = () => {
-          setIsListening(false);
-        };
-
-      } else {
-        setIsSpeechRecognitionSupported(false);
+    if (!isSpeechRecognitionSupported) return;
+  
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.continuous = false;
+    recognitionRef.current.lang = 'km-KH';
+    recognitionRef.current.interimResults = false;
+  
+    recognitionRef.current.onstart = () => {
+      setIsListening(true);
+    };
+  
+    recognitionRef.current.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      const currentIngredients = form.getValues("ingredients");
+      form.setValue("ingredients", currentIngredients ? `${currentIngredients}, ${transcript}` : transcript);
+    };
+  
+    recognitionRef.current.onerror = (event: any) => {
+      console.error("Speech recognition error", event.error);
+      let errorMessage = "មិនអាចដំណើរការការបញ្ចូលដោយសំឡេងបានទេ។ សូមព្យាយាមម្តងទៀត។";
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        errorMessage = "ការចូលប្រើមីក្រូហ្វូនត្រូវបានបដិសេធ។ សូមអនុញ្ញាតឱ្យប្រើមីក្រូហ្វូននៅក្នុងការកំណត់កម្មវិធីរុករករបស់អ្នក។";
       }
-    }
-  }, [form, toast]);
+      toast({
+        variant: "destructive",
+        title: "បញ្ហាក្នុងការស្គាល់សំឡេង",
+        description: errorMessage,
+      });
+      setIsListening(false);
+    };
+  
+    recognitionRef.current.onend = () => {
+      setIsListening(false);
+    };
+  
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [isSpeechRecognitionSupported, form, toast]);
 
   const toggleListening = () => {
     if (!isSpeechRecognitionSupported) {
@@ -140,12 +140,13 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     }
     if (isListening) {
       recognitionRef.current.stop();
+      setIsListening(false);
     } else {
       try {
         recognitionRef.current.start();
       } catch (e) {
         console.error("Could not start recognition", e);
-        if (e instanceof DOMException && e.name === 'NotAllowedError') {
+        if (e instanceof DOMException && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) {
              toast({
                 variant: "destructive",
                 title: "ការចូលប្រើមីក្រូហ្វូនត្រូវបានបដិសេធ",
