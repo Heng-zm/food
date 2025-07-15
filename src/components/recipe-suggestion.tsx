@@ -40,6 +40,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 const formSchema = z.object({
@@ -244,13 +245,13 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   );
   
   const RecipeDetailView = ({ recipe }: { recipe: Recipe }) => (
-    <div className="max-h-[85vh] overflow-y-auto">
+     <ScrollArea className="h-[85vh]">
       <RecipeCard 
         recipe={recipe}
         isFavorite={favorites.some(fav => fav.recipeName === recipe.recipeName)}
         onToggleFavorite={onToggleFavorite}
       />
-    </div>
+    </ScrollArea>
   );
 
   const renderRecipeItem = (recipe: Recipe) => (
@@ -287,7 +288,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                             placeholder="ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស"
                             {...field}
                             rows={4}
-                            className="bg-input"
+                            className="bg-muted"
                           />
                         </FormControl>
                          <Button
@@ -319,7 +320,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                         <FormLabel>ប្រភេទម្ហូប</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-input">
+                            <SelectTrigger className="bg-muted">
                               <SelectValue placeholder="ជ្រើសរើសប្រភេទម្ហូប" />
                             </SelectTrigger>
                           </FormControl>

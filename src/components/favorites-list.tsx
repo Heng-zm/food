@@ -22,6 +22,7 @@ import {
 import RecipeCard from "@/components/recipe-card";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FavoritesListProps {
   favorites: Recipe[];
@@ -57,14 +58,14 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
   }
 
   const RecipeDetailView = ({ recipe }: { recipe: Recipe }) => (
-    <div className="max-h-[85vh] overflow-y-auto">
+    <ScrollArea className="h-[85vh]">
       <RecipeCard 
         recipe={recipe}
         isFavorite={true}
         onToggleFavorite={onToggleFavorite}
         showRemoveConfirm={true}
       />
-    </div>
+    </ScrollArea>
   );
 
   const renderFavoriteItem = (recipe: Recipe) => (
