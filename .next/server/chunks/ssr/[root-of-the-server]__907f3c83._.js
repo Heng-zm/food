@@ -242,19 +242,21 @@ module.exports = mod;
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-/* __next_internal_action_entry_do_not_use__ [{"406246c4fbe951adb6f0f53617ec6bbbe34439e08d":"generateRecipeImage","409ef43600275bd476e401e5d1936cc6b9a3af8209":"synthesizeSpeech","40d86b728df33d6a80302096ed731756adba5abc0a":"suggestRecipes"},"",""] */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ [{"406246c4fbe951adb6f0f53617ec6bbbe34439e08d":"generateRecipeImage","409ef43600275bd476e401e5d1936cc6b9a3af8209":"synthesizeSpeech","40a9e007da6a471fef6d36f2e98688e23ebab8910f":"suggestSubstitutions","40d86b728df33d6a80302096ed731756adba5abc0a":"suggestRecipes"},"",""] */ __turbopack_context__.s({
     "generateRecipeImage": (()=>generateRecipeImage),
     "suggestRecipes": (()=>suggestRecipes),
+    "suggestSubstitutions": (()=>suggestSubstitutions),
     "synthesizeSpeech": (()=>synthesizeSpeech)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/app-render/encryption.js [app-rsc] (ecmascript)");
 /**
- * @fileOverview Recipe suggestion, image generation, and TTS flows.
+ * @fileOverview Recipe suggestion, image generation, TTS, and substitution flows.
  *
  * - suggestRecipes - Suggests a list of recipes based on ingredients and cuisine.
  * - generateRecipeImage - Generates an image for a specific recipe name.
  * - synthesizeSpeech - Converts recipe instructions text to speech.
+ * - suggestSubstitutions - Suggests substitutes for a given ingredient in a recipe.
  * - SuggestRecipesInput - The input type for the suggestRecipes function.
  * - Recipe - A single recipe object.
  * - SuggestRecipesOutput - The return type for the suggestRecipes function.
@@ -262,6 +264,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
  * - GenerateRecipeImageOutput - The return type for the generateRecipeImage function.
  * - SynthesizeSpeechInput - The input type for the synthesizeSpeech function.
  * - SynthesizeSpeechOutput - The return type for the synthesizeSpeech function.
+ * - SuggestSubstitutionsInput - The input type for the suggestSubstitutions function.
+ * - Substitution - A single substitution object.
+ * - SuggestSubstitutionsOutput - The return type for the suggestSubstitutions function.
  */ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/ai/genkit.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$index$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/genkit/lib/index.mjs [app-rsc] (ecmascript) <module evaluation>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/genkit/lib/common.js [app-rsc] (ecmascript)");
@@ -305,7 +310,7 @@ const recipePrompt = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2
 
   Please provide the entire response in Khmer (Cambodia).
 
-  Based on the provided ingredients and cuisine, suggest 5 distinct, excellent, detailed recipes. For each recipe, include a short, enticing description.
+  Based on the provided ingredients and cuisine, suggest 8 distinct, excellent, detailed recipes. For each recipe, include a short, enticing description.
 
   Ingredients: {{{ingredients}}}
   Cuisine: {{{cuisine}}}
@@ -424,22 +429,67 @@ const synthesizeSpeechFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src
         };
     }
 });
+// Schemas and flow for ingredient substitution
+const SuggestSubstitutionsInputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
+    recipeName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe("The name of the recipe."),
+    ingredient: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe("The ingredient that needs a substitute.")
+});
+const SubstitutionSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
+    substitute: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe("The name of the substitute ingredient."),
+    amount: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe("The amount of the substitute to use."),
+    notes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe("Any additional notes or instructions for using the substitute.")
+});
+const SuggestSubstitutionsOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
+    substitutions: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].array(SubstitutionSchema)
+});
+async function suggestSubstitutions(input) {
+    return suggestSubstitutionsFlow(input);
+}
+const substitutionPrompt = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ai"].definePrompt({
+    name: 'substitutionPrompt',
+    input: {
+        schema: SuggestSubstitutionsInputSchema
+    },
+    output: {
+        format: 'json',
+        schema: SuggestSubstitutionsOutputSchema
+    },
+    prompt: `You are an expert chef. For the recipe "{{recipeName}}", the user needs a substitute for the ingredient "{{ingredient}}".
+
+    Please provide 2-3 common, practical substitutions. For each substitution, provide the amount to use and any relevant notes.
+
+    Please provide the entire response in Khmer (Cambodia).
+
+    Ensure your response is a parsable JSON object that adheres to the provided schema.
+    `
+});
+const suggestSubstitutionsFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ai"].defineFlow({
+    name: 'suggestSubstitutionsFlow',
+    inputSchema: SuggestSubstitutionsInputSchema,
+    outputSchema: SuggestSubstitutionsOutputSchema
+}, async (input)=>{
+    const { output } = await substitutionPrompt(input);
+    return output;
+});
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     suggestRecipes,
     generateRecipeImage,
-    synthesizeSpeech
+    synthesizeSpeech,
+    suggestSubstitutions
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(suggestRecipes, "40d86b728df33d6a80302096ed731756adba5abc0a", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(generateRecipeImage, "406246c4fbe951adb6f0f53617ec6bbbe34439e08d", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(synthesizeSpeech, "409ef43600275bd476e401e5d1936cc6b9a3af8209", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(suggestSubstitutions, "40a9e007da6a471fef6d36f2e98688e23ebab8910f", null);
 }}),
 "[project]/src/app/actions.ts [app-rsc] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-/* __next_internal_action_entry_do_not_use__ [{"403a3735b3315f536ec00120ff3ad534b6418a1c9c":"getTextToSpeech","40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6":"getRecipeSuggestion","40c4dcd2c8fb1178189e7d08b043ea5180cc9e984e":"getRecipeImage"},"",""] */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ [{"403a3735b3315f536ec00120ff3ad534b6418a1c9c":"getTextToSpeech","404532642a4b0717d3fd12a87bde4aefaf0f739a7e":"getIngredientSubstitution","40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6":"getRecipeSuggestion","40c4dcd2c8fb1178189e7d08b043ea5180cc9e984e":"getRecipeImage"},"",""] */ __turbopack_context__.s({
+    "getIngredientSubstitution": (()=>getIngredientSubstitution),
     "getRecipeImage": (()=>getRecipeImage),
     "getRecipeSuggestion": (()=>getRecipeSuggestion),
     "getTextToSpeech": (()=>getTextToSpeech)
@@ -505,15 +555,35 @@ async function getTextToSpeech(data) {
         };
     }
 }
+async function getIngredientSubstitution(data) {
+    try {
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$suggest$2d$recipe$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["suggestSubstitutions"])(data);
+        return {
+            success: true,
+            data: result,
+            error: null
+        };
+    } catch (error) {
+        console.error(error);
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+        return {
+            success: false,
+            data: null,
+            error: `Failed to get ingredient substitution: ${errorMessage}`
+        };
+    }
+}
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     getRecipeSuggestion,
     getRecipeImage,
-    getTextToSpeech
+    getTextToSpeech,
+    getIngredientSubstitution
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRecipeSuggestion, "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRecipeImage, "40c4dcd2c8fb1178189e7d08b043ea5180cc9e984e", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getTextToSpeech, "403a3735b3315f536ec00120ff3ad534b6418a1c9c", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getIngredientSubstitution, "404532642a4b0717d3fd12a87bde4aefaf0f739a7e", null);
 }}),
 "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>": ((__turbopack_context__) => {
 "use strict";
@@ -522,6 +592,7 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({});
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/actions.ts [app-rsc] (ecmascript)");
+;
 ;
 ;
 ;
@@ -542,6 +613,7 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
     "403a3735b3315f536ec00120ff3ad534b6418a1c9c": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getTextToSpeech"]),
+    "404532642a4b0717d3fd12a87bde4aefaf0f739a7e": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getIngredientSubstitution"]),
     "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRecipeSuggestion"]),
     "40c4dcd2c8fb1178189e7d08b043ea5180cc9e984e": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRecipeImage"])
 });
@@ -555,6 +627,7 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
     "403a3735b3315f536ec00120ff3ad534b6418a1c9c": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["403a3735b3315f536ec00120ff3ad534b6418a1c9c"]),
+    "404532642a4b0717d3fd12a87bde4aefaf0f739a7e": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["404532642a4b0717d3fd12a87bde4aefaf0f739a7e"]),
     "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6"]),
     "40c4dcd2c8fb1178189e7d08b043ea5180cc9e984e": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40c4dcd2c8fb1178189e7d08b043ea5180cc9e984e"])
 });

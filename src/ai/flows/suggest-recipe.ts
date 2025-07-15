@@ -67,7 +67,7 @@ const recipePrompt = ai.definePrompt({
 
   Please provide the entire response in Khmer (Cambodia).
 
-  Based on the provided ingredients and cuisine, suggest 5 distinct, excellent, detailed recipes. For each recipe, include a short, enticing description.
+  Based on the provided ingredients and cuisine, suggest 8 distinct, excellent, detailed recipes. For each recipe, include a short, enticing description.
 
   Ingredients: {{{ingredients}}}
   Cuisine: {{{cuisine}}}

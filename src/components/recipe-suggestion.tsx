@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Mic, MicOff, Sparkles, ChefHat } from "lucide-react";
+import { Loader2, Mic, MicOff, Sparkles, ChefHat, Plus, Minus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const INITIAL_RECIPES_TO_SHOW = 4;
 
 const formSchema = z.object({
   ingredients: z.string().min(3, {
@@ -88,6 +89,7 @@ const allRecommendedDishes = [
 const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedRecipes, setSuggestedRecipes] = useState<Recipe[]>([]);
+  const [recipesToShow, setRecipesToShow] = useState(INITIAL_RECIPES_TO_SHOW);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -201,6 +203,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 
     if (result.success && result.data?.recipes) {
       setSuggestedRecipes(result.data.recipes);
+      setRecipesToShow(INITIAL_RECIPES_TO_SHOW);
     } else {
       toast({
         variant: "destructive",
@@ -382,7 +385,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
           <div className="mt-8">
               <h2 className="mb-6 font-headline text-2xl font-bold md:text-3xl">លទ្ធផលរូបមន្ត</h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {suggestedRecipes.map((recipe) => (
+                  {suggestedRecipes.slice(0, recipesToShow).map((recipe) => (
                       isDesktop ? (
                           <Dialog key={recipe.recipeName} open={selectedRecipe?.recipeName === recipe.recipeName} onOpenChange={handleOpenChange}>
                               <DialogTrigger asChild>
@@ -418,6 +421,21 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                       )
                   ))}
               </div>
+              {suggestedRecipes.length > INITIAL_RECIPES_TO_SHOW && (
+                <div className="mt-6 flex justify-center">
+                  {recipesToShow < suggestedRecipes.length ? (
+                    <Button variant="outline" onClick={() => setRecipesToShow(suggestedRecipes.length)}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      បង្ហាញបន្ថែម
+                    </Button>
+                  ) : (
+                    <Button variant="outline" onClick={() => setRecipesToShow(INITIAL_RECIPES_TO_SHOW)}>
+                      <Minus className="mr-2 h-4 w-4" />
+                      បង្ហាញតិច
+                    </Button>
+                  )}
+                </div>
+              )}
           </div>
       )}
     </div>
