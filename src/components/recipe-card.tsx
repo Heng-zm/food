@@ -1,11 +1,14 @@
 
 "use client";
 
-import { Clock, Heart, Printer, UtensilsCrossed, BookOpen, Trash2 } from "lucide-react";
+import { useState } from "react";
+import Image from "next/image";
+import { Clock, Heart, Printer, UtensilsCrossed, BookOpen, Trash2, Image as ImageIcon, Loader2, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
+import { getRecipeImage } from "@/app/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +21,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -27,6 +33,10 @@ interface RecipeCardProps {
 }
 
 const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false }: RecipeCardProps) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const handlePrint = () => {
     window.print();
@@ -39,6 +49,24 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
 
   const ingredientsList = parseList(recipe.ingredients);
   const instructionsList = parseList(recipe.instructions);
+
+  const handleGenerateImage = async () => {
+    setIsGeneratingImage(true);
+    setImageError(null);
+    const result = await getRecipeImage({ recipeName: recipe.recipeName });
+    setIsGeneratingImage(false);
+
+    if (result.success && result.data?.imageUrl) {
+      setImageUrl(result.data.imageUrl);
+    } else {
+      setImageError(result.error || "An unknown error occurred while generating the image.");
+      toast({
+        variant: "destructive",
+        title: "Image Generation Failed",
+        description: result.error,
+      });
+    }
+  };
 
   const FavoriteButton = () => (
     <Button
@@ -81,6 +109,33 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
 
   return (
     <div className="w-full overflow-hidden printable-area">
+       {isGeneratingImage && (
+         <div className="p-6">
+            <Skeleton className="h-48 w-full" />
+         </div>
+       )}
+       {imageError && !isGeneratingImage && (
+        <div className="p-6">
+          <Alert variant="destructive">
+            <ImageOff className="h-4 w-4" />
+            <AlertTitle>Image Failed</AlertTitle>
+            <AlertDescription>{imageError}</AlertDescription>
+          </Alert>
+        </div>
+       )}
+       {imageUrl && !isGeneratingImage && (
+        <div className="relative mb-4 h-56 w-full">
+            <Image
+              src={imageUrl}
+              alt={`Image of ${recipe.recipeName}`}
+              layout="fill"
+              objectFit="cover"
+              className="rounded-t-lg"
+              onError={() => setImageError("Failed to load the generated image.")}
+            />
+        </div>
+      )}
+
       <CardHeader className="p-6">
           <div className="flex items-start justify-between">
             <CardTitle className="font-headline text-3xl font-bold text-primary">
@@ -105,6 +160,21 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
             <Clock className="mr-2 h-4 w-4 text-primary" />
             {recipe.estimatedCookingTime}
           </Badge>
+          {!imageUrl && !isGeneratingImage && (
+            <Button variant="outline" size="sm" onClick={handleGenerateImage} disabled={isGeneratingImage}>
+              {isGeneratingImage ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <ImageIcon className="mr-2 h-4 w-4" />
+                  មើលរូបម្ហូប
+                </>
+              )}
+            </Button>
+          )}
         </div>
         
         <Separator className="my-6" />

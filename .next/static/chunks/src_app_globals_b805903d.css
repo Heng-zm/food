@@ -705,6 +705,14 @@ body {
   height: 100svh;
 }
 
+.h-48 {
+  height: 12rem;
+}
+
+.h-56 {
+  height: 14rem;
+}
+
 .max-h-96 {
   max-height: 24rem;
 }
@@ -1123,6 +1131,11 @@ body {
 .rounded-t-\[10px\] {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+}
+
+.rounded-t-lg {
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
 }
 
 .border {
