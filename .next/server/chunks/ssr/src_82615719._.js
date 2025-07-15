@@ -2256,16 +2256,46 @@ const formSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$
     })
 });
 const cuisineOptions = [
-    "ខ្មែរ",
-    "ថៃ",
-    "វៀតណាម",
-    "ចិន",
-    "ជប៉ុន",
-    "កូរ៉េ",
-    "ឥណ្ឌា",
-    "អ៊ីតាលី",
-    "ម៉ិកស៊ិក",
-    "បារាំង"
+    {
+        name: "ខ្មែរ",
+        flag: "🇰🇭"
+    },
+    {
+        name: "ថៃ",
+        flag: "🇹🇭"
+    },
+    {
+        name: "វៀតណាម",
+        flag: "🇻🇳"
+    },
+    {
+        name: "ចិន",
+        flag: "🇨🇳"
+    },
+    {
+        name: "ជប៉ុន",
+        flag: "🇯🇵"
+    },
+    {
+        name: "កូរ៉េ",
+        flag: "🇰🇷"
+    },
+    {
+        name: "ឥណ្ឌា",
+        flag: "🇮🇳"
+    },
+    {
+        name: "អ៊ីតាលី",
+        flag: "🇮🇹"
+    },
+    {
+        name: "ម៉ិកស៊ិក",
+        flag: "🇲🇽"
+    },
+    {
+        name: "បារាំង",
+        flag: "🇫🇷"
+    }
 ];
 const allRecommendedDishes = [
     "សម្លរកកូរ",
@@ -2655,6 +2685,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
                                                                     onValueChange: field.onChange,
                                                                     defaultValue: field.value,
+                                                                    value: field.value,
                                                                     children: [
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormControl"], {
                                                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectTrigger"], {
@@ -2678,9 +2709,31 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                                                         }, void 0),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
                                                                             children: cuisineOptions.map((option)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
-                                                                                    value: option,
-                                                                                    children: option
-                                                                                }, option, false, {
+                                                                                    value: option.name,
+                                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "flex items-center gap-2",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                children: option.flag
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/recipe-suggestion.tsx",
+                                                                                                lineNumber: 334,
+                                                                                                columnNumber: 35
+                                                                                            }, void 0),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                children: option.name
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/recipe-suggestion.tsx",
+                                                                                                lineNumber: 335,
+                                                                                                columnNumber: 35
+                                                                                            }, void 0)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/recipe-suggestion.tsx",
+                                                                                        lineNumber: 333,
+                                                                                        columnNumber: 33
+                                                                                    }, void 0)
+                                                                                }, option.name, false, {
                                                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
                                                                                     lineNumber: 332,
                                                                                     columnNumber: 31
@@ -2698,7 +2751,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                                                 }, void 0),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormMessage"], {}, void 0, false, {
                                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                                    lineNumber: 338,
+                                                                    lineNumber: 341,
                                                                     columnNumber: 25
                                                                 }, void 0)
                                                             ]
@@ -2733,7 +2786,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                                     className: "mr-2 h-4 w-4 animate-spin"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                    lineNumber: 347,
+                                                    lineNumber: 350,
                                                     columnNumber: 21
                                                 }, this),
                                                 "កំពុងបង្កើត..."
@@ -2744,7 +2797,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                                     className: "mr-2 h-4 w-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                    lineNumber: 352,
+                                                    lineNumber: 355,
                                                     columnNumber: 21
                                                 }, this),
                                                 "ណែនាំរូបមន្ត"
@@ -2752,7 +2805,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                         }, void 0, true)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                        lineNumber: 344,
+                                        lineNumber: 347,
                                         columnNumber: 15
                                     }, this)
                                 ]
@@ -2776,14 +2829,14 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                             className: "h-4 w-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                            lineNumber: 362,
+                                            lineNumber: 365,
                                             columnNumber: 17
                                         }, this),
                                         "ឬសាកល្បងមុខម្ហូបណាមួយក្នុងចំណោមមុខម្ហូបទាំងនេះ"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                    lineNumber: 361,
+                                    lineNumber: 364,
                                     columnNumber: 14
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2796,18 +2849,18 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                             children: dish
                                         }, dish, false, {
                                             fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                            lineNumber: 367,
+                                            lineNumber: 370,
                                             columnNumber: 21
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                    lineNumber: 365,
+                                    lineNumber: 368,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/recipe-suggestion.tsx",
-                            lineNumber: 360,
+                            lineNumber: 363,
                             columnNumber: 11
                         }, this)
                     ]
@@ -2823,7 +2876,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
             }, this),
             isLoading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(LoadingSkeleton, {}, void 0, false, {
                 fileName: "[project]/src/components/recipe-suggestion.tsx",
-                lineNumber: 382,
+                lineNumber: 385,
                 columnNumber: 21
             }, this),
             !isLoading && suggestedRecipes.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2834,7 +2887,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                         children: "លទ្ធផលរូបមន្ត"
                     }, void 0, false, {
                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                        lineNumber: 386,
+                        lineNumber: 389,
                         columnNumber: 15
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2848,7 +2901,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                         children: renderRecipeItem(recipe)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                        lineNumber: 391,
+                                        lineNumber: 394,
                                         columnNumber: 31
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogContent"], {
@@ -2861,32 +2914,32 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                                         children: selectedRecipe.recipeName
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                        lineNumber: 398,
+                                                        lineNumber: 401,
                                                         columnNumber: 43
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                    lineNumber: 397,
+                                                    lineNumber: 400,
                                                     columnNumber: 39
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
                                                     recipe: selectedRecipe
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                    lineNumber: 400,
+                                                    lineNumber: 403,
                                                     columnNumber: 39
                                                 }, this)
                                             ]
                                         }, void 0, true)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                        lineNumber: 394,
+                                        lineNumber: 397,
                                         columnNumber: 31
                                     }, this)
                                 ]
                             }, recipe.recipeName, true, {
                                 fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                lineNumber: 390,
+                                lineNumber: 393,
                                 columnNumber: 27
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Drawer"], {
                                 open: selectedRecipe?.recipeName === recipe.recipeName,
@@ -2897,7 +2950,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                         children: renderRecipeItem(recipe)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                        lineNumber: 407,
+                                        lineNumber: 410,
                                         columnNumber: 31
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerContent"], {
@@ -2909,37 +2962,37 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                                         children: selectedRecipe.recipeName
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                        lineNumber: 414,
+                                                        lineNumber: 417,
                                                         columnNumber: 41
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                    lineNumber: 413,
+                                                    lineNumber: 416,
                                                     columnNumber: 37
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
                                                     recipe: selectedRecipe
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                    lineNumber: 416,
+                                                    lineNumber: 419,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                        lineNumber: 410,
+                                        lineNumber: 413,
                                         columnNumber: 31
                                     }, this)
                                 ]
                             }, recipe.recipeName, true, {
                                 fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                lineNumber: 406,
+                                lineNumber: 409,
                                 columnNumber: 27
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                        lineNumber: 387,
+                        lineNumber: 390,
                         columnNumber: 15
                     }, this),
                     suggestedRecipes.length > INITIAL_RECIPES_TO_SHOW && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2952,14 +3005,14 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                     className: "mr-2 h-4 w-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                    lineNumber: 428,
+                                    lineNumber: 431,
                                     columnNumber: 23
                                 }, this),
                                 "បង្ហាញបន្ថែម"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/recipe-suggestion.tsx",
-                            lineNumber: 427,
+                            lineNumber: 430,
                             columnNumber: 21
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
                             variant: "outline",
@@ -2969,25 +3022,25 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                     className: "mr-2 h-4 w-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                    lineNumber: 433,
+                                    lineNumber: 436,
                                     columnNumber: 23
                                 }, this),
                                 "បង្ហាញតិច"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/recipe-suggestion.tsx",
-                            lineNumber: 432,
+                            lineNumber: 435,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                        lineNumber: 425,
+                        lineNumber: 428,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/recipe-suggestion.tsx",
-                lineNumber: 385,
+                lineNumber: 388,
                 columnNumber: 11
             }, this)
         ]

@@ -59,16 +59,16 @@ interface RecipeSuggestionProps {
 }
 
 const cuisineOptions = [
-  "ខ្មែរ",
-  "ថៃ",
-  "វៀតណាម",
-  "ចិន",
-  "ជប៉ុន",
-  "កូរ៉េ",
-  "ឥណ្ឌា",
-  "អ៊ីតាលី",
-  "ម៉ិកស៊ិក",
-  "បារាំង",
+  { name: "ខ្មែរ", flag: "🇰🇭" },
+  { name: "ថៃ", flag: "🇹🇭" },
+  { name: "វៀតណាម", flag: "🇻🇳" },
+  { name: "ចិន", flag: "🇨🇳" },
+  { name: "ជប៉ុន", flag: "🇯🇵" },
+  { name: "កូរ៉េ", flag: "🇰🇷" },
+  { name: "ឥណ្ឌា", flag: "🇮🇳" },
+  { name: "អ៊ីតាលី", flag: "🇮🇹" },
+  { name: "ម៉ិកស៊ិក", flag: "🇲🇽" },
+  { name: "បារាំង", flag: "🇫🇷" },
 ];
 
 const allRecommendedDishes = [
@@ -321,7 +321,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>ប្រភេទម្ហូប</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="bg-muted">
                               <SelectValue placeholder="ជ្រើសរើសប្រភេទម្ហូប" />
@@ -329,8 +329,11 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                           </FormControl>
                           <SelectContent>
                             {cuisineOptions.map((option) => (
-                              <SelectItem key={option} value={option}>
-                                {option}
+                              <SelectItem key={option.name} value={option.name}>
+                                <div className="flex items-center gap-2">
+                                  <span>{option.flag}</span>
+                                  <span>{option.name}</span>
+                                </div>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -444,3 +447,4 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 
 export default RecipeSuggestion;
 
+    
