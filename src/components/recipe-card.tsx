@@ -32,6 +32,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const { toast } = useToast();
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
   useEffect(() => {
     let audioInstance: HTMLAudioElement | null = null;
@@ -131,18 +132,28 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
       <CardHeader className="p-0">
         <div className="relative h-64 w-full">
           {recipe.imageUrl ? (
-            <Image
-              src={recipe.imageUrl}
-              alt={recipe.recipeName}
-              fill
-              objectFit="cover"
-              data-ai-hint="gourmet food"
-              className="bg-muted"
-            />
+            <>
+              {isImageLoading && (
+                <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
+                  <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
+                  <p>កំពុង​ទាញ​យក​រូបភាព...</p>
+                </div>
+              )}
+              <Image
+                src={recipe.imageUrl}
+                alt={recipe.recipeName}
+                fill
+                objectFit="cover"
+                data-ai-hint="gourmet food"
+                className="bg-muted"
+                onLoad={() => setIsImageLoading(false)}
+                onError={() => setIsImageLoading(false)} // Handle error case as well
+              />
+            </>
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-              <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
-              <p>កំពុងបង្កើតរូបភាព ...</p>
+              <ImageOff className="h-8 w-8 mb-2 text-primary" />
+              <p>មិនមានរូបភាព</p>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

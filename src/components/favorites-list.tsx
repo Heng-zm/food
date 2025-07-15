@@ -41,7 +41,7 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
             <div className="group cursor-pointer overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-transform duration-200 hover:-translate-y-1">
               <div className="relative h-40 w-full">
                 <Image
-                  src={recipe.imageUrl || "https://placehold.co/400x300/C45720/F5F5DC"}
+                  src={recipe.imageUrl || "https://placehold.co/600x400.png"}
                   alt={recipe.recipeName}
                   fill
                   objectFit="cover"

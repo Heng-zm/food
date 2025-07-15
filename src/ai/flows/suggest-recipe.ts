@@ -16,7 +16,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { generateRecipeImage } from './generate-recipe-image';
 import { textToSpeech } from './text-to-speech';
 
 const SuggestRecipeInputSchema = z.object({
@@ -105,12 +104,12 @@ const getRecipeDetailsFlow = ai.defineFlow(
     outputSchema: GetRecipeDetailsOutputSchema,
   },
   async ({ recipeName, instructions }) => {
-    // Generate image and audio sequentially to avoid rate limiting.
-    const imageResult = await generateRecipeImage({recipeName: recipeName});
+    // Generate image URL and audio sequentially to avoid rate limiting.
+    const imageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(recipeName)}`;
     const audioResult = await textToSpeech({text: `ការណែនាំ៖\n${instructions}`});
 
     return {
-      imageUrl: imageResult.imageUrl,
+      imageUrl: imageUrl,
       audioUrl: audioResult.audioUrl,
     };
   }
