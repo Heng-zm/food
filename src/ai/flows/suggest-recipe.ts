@@ -114,14 +114,16 @@ const generateRecipeImageFlow = ai.defineFlow(
                 },
             });
 
-            if (media && media.url) {
+            if (media?.url) {
                 return { imageUrl: media.url };
             }
-             throw new Error('Image generation failed to produce an image.');
+             // On failure, return an empty string to satisfy the schema.
+             return { imageUrl: "" };
 
         } catch (error) {
              console.error(`Failed to generate image for "${recipeName}":`, error);
-             throw new Error(`Could not generate image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+              // On error, return an empty string to satisfy the schema.
+             return { imageUrl: "" };
         }
     }
 );
