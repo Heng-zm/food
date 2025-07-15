@@ -2397,6 +2397,14 @@ body {
   --tw-enter-translate-y: -100%;
 }
 
+.data-\[state\=closed\]\:slide-out-to-bottom-\[100\%\][data-state="closed"] {
+  --tw-exit-translate-y: 100%;
+}
+
+.data-\[state\=open\]\:slide-in-from-bottom-\[100\%\][data-state="open"] {
+  --tw-enter-translate-y: 100%;
+}
+
 .data-\[state\=closed\]\:duration-300[data-state="closed"] {
   animation-duration: .3s;
 }
@@ -2556,6 +2564,18 @@ body {
     top: auto;
   }
 
+  .sm\:bottom-auto {
+    bottom: auto;
+  }
+
+  .sm\:left-\[50\%\] {
+    left: 50%;
+  }
+
+  .sm\:top-\[50\%\] {
+    top: 50%;
+  }
+
   .sm\:mt-0 {
     margin-top: 0;
   }
@@ -2574,6 +2594,20 @@ body {
 
   .sm\:max-w-sm {
     max-width: 24rem;
+  }
+
+  .sm\:max-w-lg {
+    max-width: 32rem;
+  }
+
+  .sm\:translate-x-\[-50\%\] {
+    --tw-translate-x: -50%;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  }
+
+  .sm\:translate-y-\[-50\%\] {
+    --tw-translate-y: -50%;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   }
 
   .sm\:grid-cols-2 {
@@ -2614,6 +2648,10 @@ body {
     border-radius: var(--radius);
   }
 
+  .sm\:border {
+    border-width: 1px;
+  }
+
   .sm\:p-6 {
     padding: 1.5rem;
   }
@@ -2622,8 +2660,40 @@ body {
     text-align: left;
   }
 
+  .data-\[state\=closed\]\:sm\:fade-out-0[data-state="closed"] {
+    --tw-exit-opacity: 0;
+  }
+
+  .data-\[state\=open\]\:sm\:fade-in-0[data-state="open"] {
+    --tw-enter-opacity: 0;
+  }
+
+  .data-\[state\=closed\]\:sm\:zoom-out-95[data-state="closed"] {
+    --tw-exit-scale: .95;
+  }
+
+  .data-\[state\=open\]\:sm\:zoom-in-95[data-state="open"] {
+    --tw-enter-scale: .95;
+  }
+
   .data-\[state\=open\]\:sm\:slide-in-from-bottom-full[data-state="open"] {
     --tw-enter-translate-y: 100%;
+  }
+
+  .data-\[state\=closed\]\:sm\:slide-out-to-left-1\/2[data-state="closed"] {
+    --tw-exit-translate-x: -50%;
+  }
+
+  .data-\[state\=closed\]\:sm\:slide-out-to-top-\[48\%\][data-state="closed"] {
+    --tw-exit-translate-y: -48%;
+  }
+
+  .data-\[state\=open\]\:sm\:slide-in-from-left-1\/2[data-state="open"] {
+    --tw-enter-translate-x: -50%;
+  }
+
+  .data-\[state\=open\]\:sm\:slide-in-from-top-\[48\%\][data-state="open"] {
+    --tw-enter-translate-y: -48%;
   }
 }
 
