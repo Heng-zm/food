@@ -336,10 +336,11 @@ const textToSpeechFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$
 var { g: global, __dirname } = __turbopack_context__;
 {
 // This file holds the Genkit flow for suggesting recipes based on user-provided ingredients and cuisine preferences.
-/* __next_internal_action_entry_do_not_use__ [{"400553dfbc4e431bf4a8947a4a40cd40c49c5433b7":"getAudioForRecipe","401a779b31d2bfc23f9526a7e90e5478194638e19a":"suggestRecipe","409b838c47570daa6b745fec787e26d4bc20dc56c4":"getRecipeDetails"},"",""] */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ [{"400553dfbc4e431bf4a8947a4a40cd40c49c5433b7":"getAudioForRecipe","401a779b31d2bfc23f9526a7e90e5478194638e19a":"suggestRecipe","409b838c47570daa6b745fec787e26d4bc20dc56c4":"getRecipeDetails","409e029098336e9dd6af0675c12ab8dff5a96814f4":"suggestRecipeAndDetails"},"",""] */ __turbopack_context__.s({
     "getAudioForRecipe": (()=>getAudioForRecipe),
     "getRecipeDetails": (()=>getRecipeDetails),
-    "suggestRecipe": (()=>suggestRecipe)
+    "suggestRecipe": (()=>suggestRecipe),
+    "suggestRecipeAndDetails": (()=>suggestRecipeAndDetails)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$app$2d$render$2f$encryption$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/app-render/encryption.js [app-rsc] (ecmascript)");
@@ -347,8 +348,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
  * @fileOverview Recipe suggestion flow.
  *
  * - suggestRecipe - A function that suggests recipes based on available ingredients and desired cuisine.
- * - getRecipeDetails - A function that gets the image and audio for a specific recipe.
- * - suggestRecipeAndDetails - A function that suggests a single recipe and fetches its details.
+ * - getRecipeDetails - A function that gets the image for a specific recipe.
+ * - suggestRecipeAndDetails - A function that suggests recipes and fetches their details (images).
+ * - getAudioForRecipe - A function that gets audio for a specific recipe.
  * - SuggestRecipeInput - The input type for the suggestRecipe function.
  * - Recipe - A single recipe object.
  * - SuggestRecipeOutput - The return type for the suggestRecipe function.
@@ -384,6 +386,11 @@ const SuggestRecipeOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2
         imageUrl: true,
         audioUrl: true
     })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ។')
+});
+const SuggestRecipeAndDetailsOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
+    recipes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].array(RecipeSchema.omit({
+        audioUrl: true
+    })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ជាមួយរូបភាព។')
 });
 async function suggestRecipe(input) {
     return suggestRecipeFlow(input);
@@ -471,24 +478,56 @@ const getAudioForRecipeFlow = __TURBOPACK__imported__module__$5b$project$5d2f$sr
         audioUrl: audioResult.audioUrl
     };
 });
+async function suggestRecipeAndDetails(input) {
+    return suggestRecipeAndDetailsFlow(input);
+}
+const suggestRecipeAndDetailsFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ai"].defineFlow({
+    name: 'suggestRecipeAndDetailsFlow',
+    inputSchema: SuggestRecipeInputSchema,
+    outputSchema: SuggestRecipeAndDetailsOutputSchema
+}, async (input)=>{
+    const suggestionResult = await suggestRecipeFlow(input);
+    const recipesWithDetails = await Promise.all(suggestionResult.recipes.map(async (recipe)=>{
+        try {
+            const details = await getRecipeDetailsFlow({
+                recipeName: recipe.recipeName
+            });
+            return {
+                ...recipe,
+                imageUrl: details.imageUrl
+            };
+        } catch (error) {
+            console.error(`Failed to get details for ${recipe.recipeName}`, error);
+            // Return the recipe without an image URL if fetching fails
+            return {
+                ...recipe,
+                imageUrl: "https://placehold.co/600x400.png"
+            };
+        }
+    }));
+    return {
+        recipes: recipesWithDetails
+    };
+});
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     suggestRecipe,
     getRecipeDetails,
-    getAudioForRecipe
+    getAudioForRecipe,
+    suggestRecipeAndDetails
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(suggestRecipe, "401a779b31d2bfc23f9526a7e90e5478194638e19a", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRecipeDetails, "409b838c47570daa6b745fec787e26d4bc20dc56c4", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getAudioForRecipe, "400553dfbc4e431bf4a8947a4a40cd40c49c5433b7", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(suggestRecipeAndDetails, "409e029098336e9dd6af0675c12ab8dff5a96814f4", null);
 }}),
 "[project]/src/app/actions.ts [app-rsc] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-/* __next_internal_action_entry_do_not_use__ [{"4072f449b9b84710caba97820d55fe8ed5df361598":"getAudioForRecipeAction","40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6":"getRecipeSuggestion","40ddeef526be29027e9482a3d131d97b6609769f70":"getRecipeDetailsAction"},"",""] */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ [{"4072f449b9b84710caba97820d55fe8ed5df361598":"getAudioForRecipeAction","40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6":"getRecipeSuggestion"},"",""] */ __turbopack_context__.s({
     "getAudioForRecipeAction": (()=>getAudioForRecipeAction),
-    "getRecipeDetailsAction": (()=>getRecipeDetailsAction),
     "getRecipeSuggestion": (()=>getRecipeSuggestion)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
@@ -500,7 +539,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 async function getRecipeSuggestion(data) {
     try {
-        const recipe = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$suggest$2d$recipe$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["suggestRecipe"])(data);
+        const recipe = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$suggest$2d$recipe$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["suggestRecipeAndDetails"])(data);
         return {
             success: true,
             data: recipe,
@@ -513,24 +552,6 @@ async function getRecipeSuggestion(data) {
             success: false,
             data: null,
             error: `Failed to get recipe suggestion: ${errorMessage}`
-        };
-    }
-}
-async function getRecipeDetailsAction(data) {
-    try {
-        const details = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$suggest$2d$recipe$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRecipeDetails"])(data);
-        return {
-            success: true,
-            data: details,
-            error: null
-        };
-    } catch (error) {
-        console.error(error);
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-        return {
-            success: false,
-            data: null,
-            error: `Failed to get recipe details: ${errorMessage}`
         };
     }
 }
@@ -555,11 +576,9 @@ async function getAudioForRecipeAction(data) {
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     getRecipeSuggestion,
-    getRecipeDetailsAction,
     getAudioForRecipeAction
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRecipeSuggestion, "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRecipeDetailsAction, "40ddeef526be29027e9482a3d131d97b6609769f70", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getAudioForRecipeAction, "4072f449b9b84710caba97820d55fe8ed5df361598", null);
 }}),
 "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>": ((__turbopack_context__) => {
@@ -569,7 +588,6 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({});
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/actions.ts [app-rsc] (ecmascript)");
-;
 ;
 ;
 }}),
@@ -589,8 +607,7 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
     "4072f449b9b84710caba97820d55fe8ed5df361598": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getAudioForRecipeAction"]),
-    "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRecipeSuggestion"]),
-    "40ddeef526be29027e9482a3d131d97b6609769f70": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRecipeDetailsAction"])
+    "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRecipeSuggestion"])
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/actions.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => "[project]/src/app/actions.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <locals>');
@@ -602,8 +619,7 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
     "4072f449b9b84710caba97820d55fe8ed5df361598": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["4072f449b9b84710caba97820d55fe8ed5df361598"]),
-    "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6"]),
-    "40ddeef526be29027e9482a3d131d97b6609769f70": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40ddeef526be29027e9482a3d131d97b6609769f70"])
+    "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6"])
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => "[project]/src/app/actions.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <module evaluation>');
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => "[project]/src/app/actions.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <exports>');

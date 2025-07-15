@@ -23,7 +23,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RecipeCard from "@/components/recipe-card";
-import { getRecipeSuggestion, getRecipeDetailsAction } from "@/app/actions";
+import { getRecipeSuggestion } from "@/app/actions";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -77,7 +77,6 @@ const allRecommendedDishes = [
 
 const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [fetchingRecipeDetails, setFetchingRecipeDetails] = useState<Record<string, boolean>>({});
   const [suggestedRecipes, setSuggestedRecipes] = useState<Recipe[] | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isListening, setIsListening] = useState(false);
@@ -201,33 +200,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     }
   }
   
-  const fetchDetailsForRecipe = async (recipe: Recipe) => {
-    if (recipe.imageUrl) return; // Don't fetch if image already exists
-
-    setFetchingRecipeDetails(prev => ({...prev, [recipe.recipeName]: true}));
-
-    const result = await getRecipeDetailsAction({ recipeName: recipe.recipeName });
-
-    if (result.success && result.data) {
-        const fullRecipe = { ...recipe, imageUrl: result.data.imageUrl };
-        
-        // Update the master list
-        setSuggestedRecipes(prev => 
-            prev?.map(r => r.recipeName === recipe.recipeName ? fullRecipe : r) || null
-        );
-        // Update the selected recipe in the dialog
-        setSelectedRecipe(fullRecipe);
-    } else {
-        console.error(`Failed to get details for ${recipe.recipeName}:`, result.error);
-        toast({
-          variant: "destructive",
-          title: "មិនអាចផ្ទុករូបភាពបានទេ",
-          description: result.error || "មានបញ្ហាក្នុងការទាញយករូបភាពសម្រាប់រូបមន្តនេះ។",
-        });
-    }
-    setFetchingRecipeDetails(prev => ({...prev, [recipe.recipeName]: false}));
-  };
-
   const handleRecommendedDishClick = (dish: string) => {
     form.setValue("ingredients", dish);
     form.setValue("cuisine", "ខ្មែរ");
@@ -236,7 +208,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   
   const handleSelectRecipe = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
-    fetchDetailsForRecipe(recipe);
   };
 
   const handleAudioUpdate = (audioUrl: string) => {
@@ -270,24 +241,29 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   );
   
   const renderRecipeThumbnail = (recipe: Recipe) => {
-    const hasImage = !!recipe.imageUrl;
+    const hasImage = !!recipe.imageUrl && !recipe.imageUrl.includes('placehold.co');
+    const isImageLoading = !hasImage && isLoading;
 
     return (
       <div className="relative h-40 w-full">
-        {!hasImage && (
+        {isImageLoading ? (
             <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-                <ImageOff className="h-8 w-8" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-        )}
-        {hasImage && (
+        ) : hasImage ? (
              <Image
                 src={recipe.imageUrl!}
                 alt={recipe.recipeName}
                 fill
-                objectFit="cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                style={{ objectFit: 'cover' }}
                 data-ai-hint="gourmet food"
                 className="transition-transform duration-300 group-hover:scale-105"
             />
+        ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
+                <ImageOff className="h-8 w-8" />
+            </div>
         )}
          <div className="absolute inset-0 bg-black/30" />
       </div>
@@ -447,7 +423,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                 isFavorite={favorites.some(fav => fav.recipeName === selectedRecipe.recipeName)}
                 onToggleFavorite={onToggleFavorite}
                 onAudioUpdate={handleAudioUpdate}
-                isFetchingDetails={fetchingRecipeDetails[selectedRecipe.recipeName]}
               />
             </DialogContent>
           </Dialog>

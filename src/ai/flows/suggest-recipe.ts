@@ -6,8 +6,9 @@
  * @fileOverview Recipe suggestion flow.
  *
  * - suggestRecipe - A function that suggests recipes based on available ingredients and desired cuisine.
- * - getRecipeDetails - A function that gets the image and audio for a specific recipe.
- * - suggestRecipeAndDetails - A function that suggests a single recipe and fetches its details.
+ * - getRecipeDetails - A function that gets the image for a specific recipe.
+ * - suggestRecipeAndDetails - A function that suggests recipes and fetches their details (images).
+ * - getAudioForRecipe - A function that gets audio for a specific recipe.
  * - SuggestRecipeInput - The input type for the suggestRecipe function.
  * - Recipe - A single recipe object.
  * - SuggestRecipeOutput - The return type for the suggestRecipe function.
@@ -44,6 +45,12 @@ const SuggestRecipeOutputSchema = z.object({
   recipes: z.array(RecipeSchema.omit({ imageUrl: true, audioUrl: true })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ។'),
 });
 export type SuggestRecipeOutput = z.infer<typeof SuggestRecipeOutputSchema>;
+
+const SuggestRecipeAndDetailsOutputSchema = z.object({
+    recipes: z.array(RecipeSchema.omit({ audioUrl: true })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ជាមួយរូបភាព។'),
+});
+export type SuggestRecipeAndDetailsOutput = z.infer<typeof SuggestRecipeAndDetailsOutputSchema>;
+
 
 export async function suggestRecipe(input: SuggestRecipeInput): Promise<SuggestRecipeOutput> {
   return suggestRecipeFlow(input);
@@ -152,5 +159,36 @@ const getAudioForRecipeFlow = ai.defineFlow(
     return {
       audioUrl: audioResult.audioUrl,
     };
+  }
+);
+
+// New flow that combines recipe suggestion and image generation
+export async function suggestRecipeAndDetails(input: SuggestRecipeInput): Promise<SuggestRecipeAndDetailsOutput> {
+  return suggestRecipeAndDetailsFlow(input);
+}
+
+const suggestRecipeAndDetailsFlow = ai.defineFlow(
+  {
+    name: 'suggestRecipeAndDetailsFlow',
+    inputSchema: SuggestRecipeInputSchema,
+    outputSchema: SuggestRecipeAndDetailsOutputSchema,
+  },
+  async (input) => {
+    const suggestionResult = await suggestRecipeFlow(input);
+
+    const recipesWithDetails = await Promise.all(
+      suggestionResult.recipes.map(async (recipe) => {
+        try {
+          const details = await getRecipeDetailsFlow({ recipeName: recipe.recipeName });
+          return { ...recipe, imageUrl: details.imageUrl };
+        } catch (error) {
+          console.error(`Failed to get details for ${recipe.recipeName}`, error);
+          // Return the recipe without an image URL if fetching fails
+          return { ...recipe, imageUrl: "https://placehold.co/600x400.png" };
+        }
+      })
+    );
+
+    return { recipes: recipesWithDetails };
   }
 );
