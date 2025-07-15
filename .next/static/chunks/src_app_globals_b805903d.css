@@ -1804,6 +1804,10 @@ body {
   animation-timing-function: linear;
 }
 
+.paused {
+  animation-play-state: paused;
+}
+
 @media print {
   body * {
     visibility: hidden;
