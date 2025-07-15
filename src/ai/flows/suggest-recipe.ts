@@ -8,19 +8,15 @@
  * - suggestRecipe - A function that suggests recipes based on available ingredients and desired cuisine.
  * - getRecipeDetails - A function that gets the image for a specific recipe.
  * - suggestRecipeAndDetails - A function that suggests recipes and fetches their details (images).
- * - getAudioForRecipe - A function that gets audio for a specific recipe.
  * - SuggestRecipeInput - The input type for the suggestRecipe function.
  * - Recipe - A single recipe object.
  * - SuggestRecipeOutput - The return type for the suggestRecipe function.
  * - GetRecipeDetailsInput - The input type for the getRecipeDetails function.
  * - GetRecipeDetailsOutput - The return type for the getRecipeDetails function.
- * - GetAudioForRecipeInput - The input type for the getAudioForRecipe function.
- * - GetAudioForRecipeOutput - The return type for the getAudioForRecipe function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { textToSpeech } from './text-to-speech';
 
 const SuggestRecipeInputSchema = z.object({
   ingredients: z
@@ -37,17 +33,16 @@ const RecipeSchema = z.object({
   estimatedCookingTime: z.string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
   nutritionalInformation: z.string().describe('ព័ត៌មានអាហារូបត្ថម្ភសម្រាប់រូបមន្ត។'),
   imageUrl: z.string().optional().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
-  audioUrl: z.string().optional().describe("URL ទិន្នន័យនៃសំឡេងនៃការណែនាំ។"),
 });
 export type Recipe = z.infer<typeof RecipeSchema>;
 
 const SuggestRecipeOutputSchema = z.object({
-  recipes: z.array(RecipeSchema.omit({ imageUrl: true, audioUrl: true })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ។'),
+  recipes: z.array(RecipeSchema.omit({ imageUrl: true })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ។'),
 });
 export type SuggestRecipeOutput = z.infer<typeof SuggestRecipeOutputSchema>;
 
 const SuggestRecipeAndDetailsOutputSchema = z.object({
-    recipes: z.array(RecipeSchema.omit({ audioUrl: true })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ជាមួយរូបភាព។'),
+    recipes: z.array(RecipeSchema).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ជាមួយរូបភាព។'),
 });
 export type SuggestRecipeAndDetailsOutput = z.infer<typeof SuggestRecipeAndDetailsOutputSchema>;
 
@@ -126,38 +121,6 @@ const getRecipeDetailsFlow = ai.defineFlow(
     
     return {
       imageUrl: media.url,
-    };
-  }
-);
-
-
-// Flow to get audio for a single recipe
-const GetAudioForRecipeInputSchema = z.object({
-  instructions: z.string(),
-});
-export type GetAudioForRecipeInput = z.infer<typeof GetAudioForRecipeInputSchema>;
-
-const GetAudioForRecipeOutputSchema = z.object({
-  audioUrl: z.string().describe("URL ទិន្នន័យនៃសំឡេងនៃការណែនាំ។"),
-});
-export type GetAudioForRecipeOutput = z.infer<typeof GetAudioForRecipeOutputSchema>;
-
-
-export async function getAudioForRecipe(input: GetAudioForRecipeInput): Promise<GetAudioForRecipeOutput> {
-  return getAudioForRecipeFlow(input);
-}
-
-const getAudioForRecipeFlow = ai.defineFlow(
-  {
-    name: 'getAudioForRecipeFlow',
-    inputSchema: GetAudioForRecipeInputSchema,
-    outputSchema: GetAudioForRecipeOutputSchema,
-  },
-  async ({ instructions }) => {
-    const audioResult = await textToSpeech({text: `ការណែនាំ៖\n${instructions}`});
-
-    return {
-      audioUrl: audioResult.audioUrl,
     };
   }
 );

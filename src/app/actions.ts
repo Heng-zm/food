@@ -2,11 +2,8 @@
 
 import { 
   suggestRecipeAndDetails,
-  getAudioForRecipe,
   type SuggestRecipeInput, 
   type SuggestRecipeAndDetailsOutput,
-  type GetAudioForRecipeInput,
-  type GetAudioForRecipeOutput,
 } from '@/ai/flows/suggest-recipe';
 
 export async function getRecipeSuggestion(
@@ -19,18 +16,5 @@ export async function getRecipeSuggestion(
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, data: null, error: `Failed to get recipe suggestion: ${errorMessage}` };
-  }
-}
-
-export async function getAudioForRecipeAction(
-  data: GetAudioForRecipeInput
-): Promise<{ success: boolean; data: GetAudioForRecipeOutput | null; error: string | null; }> {
-  try {
-    const details = await getAudioForRecipe(data);
-    return { success: true, data: details, error: null };
-  } catch (error) {
-    console.error(error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    return { success: false, data: null, error: `Failed to get audio: ${errorMessage}` };
   }
 }

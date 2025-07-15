@@ -219,16 +219,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     setSelectedRecipe(recipe);
   };
 
-  const handleAudioUpdate = (audioUrl: string) => {
-    if (selectedRecipe) {
-        const updatedRecipe = { ...selectedRecipe, audioUrl };
-        setSuggestedRecipes(prev => 
-            prev?.map(r => r.recipeName === selectedRecipe.recipeName ? updatedRecipe : r) || null
-        );
-        setSelectedRecipe(updatedRecipe);
-    }
-  }
-
   const handleNewSearch = () => {
     setSelectedRecipe(null);
     setSuggestedRecipes(null);
@@ -250,8 +240,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   );
   
   const renderRecipeThumbnail = (recipe: Recipe) => {
-    const hasImage = !!recipe.imageUrl && !recipe.imageUrl.includes('placehold.co');
-  
     return (
       <div className="relative h-40 w-full">
         {recipe.imageUrl ? (
@@ -281,7 +269,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
           recipe={recipe}
           isFavorite={favorites.some(fav => fav.recipeName === recipe.recipeName)}
           onToggleFavorite={onToggleFavorite}
-          onAudioUpdate={handleAudioUpdate}
         />
       </div>
     );
