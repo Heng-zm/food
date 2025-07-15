@@ -45,7 +45,7 @@ export default function Home() {
       </header>
 
       <Tabs defaultValue="suggestion" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 bg-muted">
           <TabsTrigger value="suggestion">
             <ChefHat className="mr-2 h-4 w-4" />
             ណែនាំរូបមន្ត
