@@ -34,16 +34,19 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   const { toast } = useToast();
 
   useEffect(() => {
+    let audioInstance: HTMLAudioElement | null = null;
     if (recipe.audioUrl) {
-      const audioInstance = new Audio(recipe.audioUrl);
+      audioInstance = new Audio(recipe.audioUrl);
       audioInstance.onended = () => setIsPlaying(false);
       setAudio(audioInstance);
-
-      return () => {
-        audioInstance.pause();
-        setAudio(null);
-      };
     }
+
+    return () => {
+      if (audioInstance) {
+        audioInstance.pause();
+      }
+      setAudio(null);
+    };
   }, [recipe.audioUrl]);
 
   const handlePrint = () => {
