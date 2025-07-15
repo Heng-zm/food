@@ -311,7 +311,13 @@ const textToSpeechFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$
                         voiceName: 'Algenib'
                     }
                 }
-            }
+            },
+            safetySettings: [
+                {
+                    category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                    threshold: 'BLOCK_NONE'
+                }
+            ]
         },
         prompt: text
     });

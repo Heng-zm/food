@@ -3,11 +3,10 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Play, Pause, Trash2, ImageOff, Loader2 } from "lucide-react";
+import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Play, Pause, Trash2, ImageOff, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
 import { getAudioForRecipeAction } from "@/app/actions";
 import {
@@ -21,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 
 interface RecipeCardProps {
@@ -35,7 +35,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [isFetchingAudio, setIsFetchingAudio] = useState(false);
-  const { toast } = useToast();
+  const [audioError, setAudioError] = useState<string | null>(null);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
@@ -46,7 +46,8 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
       audioInstance.onended = () => setIsPlaying(false);
       setAudio(audioInstance);
     }
-
+    
+    // Cleanup function to pause audio and remove event listener
     return () => {
       if (audioInstance) {
         audioInstance.pause();
@@ -72,6 +73,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   }
   
   const handleReadAloud = async () => {
+    setAudioError(null);
     if (audio) {
       if (isPlaying) {
         audio.pause();
@@ -79,11 +81,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
       } else {
         audio.play().catch(e => {
           console.error("Error playing audio:", e);
-          toast({
-            variant: "destructive",
-            title: "បញ្ហាក្នុងការចាក់សំឡេង",
-            description: "មិនអាចចាក់ឯកសារអូឌីយ៉ូបានទេ។ សូមព្យាយាមម្តងទៀត។",
-          });
+          setAudioError("មិនអាចចាក់ឯកសារអូឌីយ៉ូបានទេ។ សូមព្យាយាមម្តងទៀត។");
         });
         setIsPlaying(true);
       }
@@ -103,14 +101,13 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
       const newAudio = new Audio(result.data.audioUrl);
       newAudio.onended = () => setIsPlaying(false);
       setAudio(newAudio);
-      newAudio.play().catch(e => console.error("Error playing new audio:", e));
+      newAudio.play().catch(e => {
+        console.error("Error playing new audio:", e)
+        setAudioError("មិនអាចចាក់ឯកសារអូឌីយ៉ូបានទេ។ សូមព្យាយាមម្តងទៀត។");
+      });
       setIsPlaying(true);
     } else {
-      toast({
-        variant: "destructive",
-        title: "មិនអាចបង្កើតសំឡេងបានទេ",
-        description: result.error || "មានបញ្ហាក្នុងការបង្កើតឯកសារអូឌីយ៉ូ។",
-      });
+      setAudioError(result.error || "មានបញ្ហាក្នុងការបង្កើតឯកសារអូឌីយ៉ូ។");
     }
   };
 
@@ -179,7 +176,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                     alt={recipe.recipeName}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    objectFit="cover"
+                    style={{objectFit: "cover"}}
                     data-ai-hint="gourmet food"
                     className="bg-muted transition-opacity duration-300"
                     onLoad={() => setIsImageLoading(false)}
@@ -235,6 +232,16 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
             {recipe.nutritionalInformation}
           </Badge>
         </div>
+        
+        {audioError && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>បញ្ហាក្នុងការបង្កើតសំឡេង</AlertTitle>
+            <AlertDescription>
+              {audioError}
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Separator className="my-6" />
 

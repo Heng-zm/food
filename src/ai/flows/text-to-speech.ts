@@ -70,6 +70,12 @@ const textToSpeechFlow = ai.defineFlow(
             prebuiltVoiceConfig: { voiceName: 'Algenib' },
           },
         },
+        safetySettings: [
+            {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_NONE',
+            }
+        ]
       },
       prompt: text,
     });
