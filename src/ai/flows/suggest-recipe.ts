@@ -2,11 +2,12 @@
 'use server';
 
 /**
- * @fileOverview Recipe suggestion, image generation, and TTS flows.
+ * @fileOverview Recipe suggestion, image generation, TTS, and substitution flows.
  *
  * - suggestRecipes - Suggests a list of recipes based on ingredients and cuisine.
  * - generateRecipeImage - Generates an image for a specific recipe name.
  * - synthesizeSpeech - Converts recipe instructions text to speech.
+ * - suggestSubstitutions - Suggests substitutes for a given ingredient in a recipe.
  * - SuggestRecipesInput - The input type for the suggestRecipes function.
  * - Recipe - A single recipe object.
  * - SuggestRecipesOutput - The return type for the suggestRecipes function.
@@ -14,6 +15,9 @@
  * - GenerateRecipeImageOutput - The return type for the generateRecipeImage function.
  * - SynthesizeSpeechInput - The input type for the synthesizeSpeech function.
  * - SynthesizeSpeechOutput - The return type for the synthesizeSpeech function.
+ * - SuggestSubstitutionsInput - The input type for the suggestSubstitutions function.
+ * - Substitution - A single substitution object.
+ * - SuggestSubstitutionsOutput - The return type for the suggestSubstitutions function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -202,5 +206,59 @@ const synthesizeSpeechFlow = ai.defineFlow(
             console.error('Failed to synthesize speech:', error);
             return { audioUrl: '' };
         }
+    }
+);
+
+// Schemas and flow for ingredient substitution
+const SuggestSubstitutionsInputSchema = z.object({
+    recipeName: z.string().describe("The name of the recipe."),
+    ingredient: z.string().describe("The ingredient that needs a substitute."),
+});
+export type SuggestSubstitutionsInput = z.infer<typeof SuggestSubstitutionsInputSchema>;
+
+const SubstitutionSchema = z.object({
+    substitute: z.string().describe("The name of the substitute ingredient."),
+    amount: z.string().describe("The amount of the substitute to use."),
+    notes: z.string().describe("Any additional notes or instructions for using the substitute."),
+});
+export type Substitution = z.infer<typeof SubstitutionSchema>;
+
+const SuggestSubstitutionsOutputSchema = z.object({
+    substitutions: z.array(SubstitutionSchema),
+});
+export type SuggestSubstitutionsOutput = z.infer<typeof SuggestSubstitutionsOutputSchema>;
+
+export async function suggestSubstitutions(
+  input: SuggestSubstitutionsInput
+): Promise<SuggestSubstitutionsOutput> {
+  return suggestSubstitutionsFlow(input);
+}
+
+const substitutionPrompt = ai.definePrompt({
+    name: 'substitutionPrompt',
+    input: { schema: SuggestSubstitutionsInputSchema },
+    output: {
+        format: 'json',
+        schema: SuggestSubstitutionsOutputSchema,
+    },
+    prompt: `You are an expert chef. For the recipe "{{recipeName}}", the user needs a substitute for the ingredient "{{ingredient}}".
+
+    Please provide 2-3 common, practical substitutions. For each substitution, provide the amount to use and any relevant notes.
+
+    Please provide the entire response in Khmer (Cambodia).
+
+    Ensure your response is a parsable JSON object that adheres to the provided schema.
+    `,
+});
+
+const suggestSubstitutionsFlow = ai.defineFlow(
+    {
+        name: 'suggestSubstitutionsFlow',
+        inputSchema: SuggestSubstitutionsInputSchema,
+        outputSchema: SuggestSubstitutionsOutputSchema,
+    },
+    async (input) => {
+        const { output } = await substitutionPrompt(input);
+        return output!;
     }
 );

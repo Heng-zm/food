@@ -3,12 +3,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Clock, Heart, Printer, UtensilsCrossed, BookOpen, Trash2, Image as ImageIcon, Loader2, ImageOff, Volume2 } from "lucide-react";
+import { Clock, Heart, Printer, UtensilsCrossed, BookOpen, Trash2, Image as ImageIcon, Loader2, ImageOff, Volume2, Replace } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import type { Recipe } from "@/ai/flows/suggest-recipe";
-import { getRecipeImage, getTextToSpeech } from "@/app/actions";
+import type { Recipe, Substitution } from "@/ai/flows/suggest-recipe";
+import { getRecipeImage, getTextToSpeech, getIngredientSubstitution } from "@/app/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -31,6 +32,79 @@ interface RecipeCardProps {
   onToggleFavorite: (recipe: Recipe) => void;
   showRemoveConfirm?: boolean;
 }
+
+const IngredientItem = ({ ingredient, recipeName }: { ingredient: string, recipeName: string }) => {
+  const [substitutions, setSubstitutions] = useState<Substitution[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleFetchSubstitutions = async () => {
+    setIsLoading(true);
+    const result = await getIngredientSubstitution({ recipeName, ingredient });
+    setIsLoading(false);
+
+    if (result.success && result.data?.substitutions) {
+      setSubstitutions(result.data.substitutions);
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Substitution Failed",
+        description: result.error || "Could not fetch substitutions.",
+      });
+    }
+  };
+
+  return (
+    <li className="flex items-start justify-between">
+      <div className="flex items-start">
+        <span className="mr-2 mt-1 block h-1.5 w-1.5 rounded-full bg-primary" />
+        <span>{ingredient}</span>
+      </div>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 no-print"
+            onClick={handleFetchSubstitutions}
+          >
+            <Replace className="h-4 w-4 text-muted-foreground hover:text-primary" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80">
+          <div className="grid gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium leading-none">ការជំនួសសម្រាប់ "{ingredient}"</h4>
+              <p className="text-sm text-muted-foreground">
+                នេះគឺជាជម្រើសមួយចំនួនប្រសិនបើអ្នកមិនមានគ្រឿងផ្សំនេះ។
+              </p>
+            </div>
+            {isLoading ? (
+              <div className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>កំពុងស្វែងរក...</span>
+              </div>
+            ) : substitutions.length > 0 ? (
+              <div className="grid gap-2">
+                {substitutions.map((sub, index) => (
+                  <div key={index} className="grid grid-cols-[auto_1fr] items-start gap-x-2">
+                    <span className="font-semibold">{sub.substitute}:</span>
+                    <div className="text-sm text-muted-foreground">
+                        {sub.amount} - {sub.notes}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">មិនមានការផ្តល់យោបល់ទេ។</p>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </li>
+  );
+};
+
 
 const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false }: RecipeCardProps) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -219,10 +293,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
             </h3>
             <ul className="space-y-2">
               {ingredientsList.map((ingredient, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="mr-2 mt-1 block h-1.5 w-1.5 rounded-full bg-primary" />
-                  <span>{ingredient}</span>
-                </li>
+                <IngredientItem key={index} ingredient={ingredient} recipeName={recipe.recipeName} />
               ))}
             </ul>
           </div>

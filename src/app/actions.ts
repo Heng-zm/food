@@ -10,6 +10,9 @@ import {
   synthesizeSpeech,
   type SynthesizeSpeechInput,
   type SynthesizeSpeechOutput,
+  suggestSubstitutions,
+  type SuggestSubstitutionsInput,
+  type SuggestSubstitutionsOutput,
 } from '@/ai/flows/suggest-recipe';
 
 export async function getRecipeSuggestion(
@@ -48,5 +51,18 @@ export async function getTextToSpeech(
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, data: null, error: `Failed to get recipe speech: ${errorMessage}` };
+  }
+}
+
+export async function getIngredientSubstitution(
+  data: SuggestSubstitutionsInput
+): Promise<{ success: boolean; data: SuggestSubstitutionsOutput | null; error: string | null; }> {
+  try {
+    const result = await suggestSubstitutions(data);
+    return { success: true, data: result, error: null };
+  } catch (error) {
+    console.error(error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return { success: false, data: null, error: `Failed to get ingredient substitution: ${errorMessage}` };
   }
 }

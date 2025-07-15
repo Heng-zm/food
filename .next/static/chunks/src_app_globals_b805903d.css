@@ -692,6 +692,10 @@ body {
   height: 1px;
 }
 
+.h-\[70vh\] {
+  height: 70vh;
+}
+
 .h-\[var\(--radix-select-trigger-height\)\] {
   height: var(--radix-select-trigger-height);
 }
@@ -712,20 +716,8 @@ body {
   height: 100svh;
 }
 
-.h-\[85vh\] {
-  height: 85vh;
-}
-
-.h-\[70vh\] {
-  height: 70vh;
-}
-
 .max-h-96 {
   max-height: 24rem;
-}
-
-.max-h-\[85vh\] {
-  max-height: 85vh;
 }
 
 .max-h-\[90svh\] {
@@ -1251,10 +1243,6 @@ body {
 
 .bg-destructive {
   background-color: hsl(var(--destructive));
-}
-
-.bg-input {
-  background-color: hsl(var(--input));
 }
 
 .bg-muted {
