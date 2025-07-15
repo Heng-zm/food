@@ -208,17 +208,17 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   };
 
   const handleRecipeSelect = async (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
     if (recipe.imageUrl) {
-      setSelectedRecipe(recipe);
       return;
     }
 
     setIsFetchingDetails(true);
-    setSelectedRecipe(recipe); // Show text details immediately
-
+    
     const result = await getRecipeDetailsAction({
       recipeName: recipe.recipeName,
     });
+    
     setIsFetchingDetails(false);
 
     if (result.success && result.data) {
@@ -392,13 +392,14 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
             <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
               <DialogHeader className="p-6 pb-0 flex flex-row items-center justify-between">
                 <DialogTitle>{selectedRecipe.recipeName}</DialogTitle>
-                {isFetchingDetails && <Loader2 className="h-5 w-5 animate-spin text-primary" />}
+                
               </DialogHeader>
               <RecipeCard
                 recipe={selectedRecipe}
                 isFavorite={favorites.some(fav => fav.recipeName === selectedRecipe.recipeName)}
                 onToggleFavorite={onToggleFavorite}
                 onAudioUpdate={handleAudioUpdate}
+                isFetchingDetails={isFetchingDetails}
               />
             </DialogContent>
           </Dialog>

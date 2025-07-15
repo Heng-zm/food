@@ -28,14 +28,16 @@ interface RecipeCardProps {
   onToggleFavorite: (recipe: Recipe) => void;
   showRemoveConfirm?: boolean;
   onAudioUpdate?: (audioUrl: string) => void;
+  isFetchingDetails?: boolean;
 }
 
-const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false, onAudioUpdate }: RecipeCardProps) => {
+const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false, onAudioUpdate, isFetchingDetails = false }: RecipeCardProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [isFetchingAudio, setIsFetchingAudio] = useState(false);
   const { toast } = useToast();
-  const [isImageLoading, setIsImageLoading] = useState(true);
+  const [isImageLoading, setIsImageLoading] = useState(!!recipe.imageUrl);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     let audioInstance: HTMLAudioElement | null = null;
@@ -53,6 +55,11 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
       setAudio(null);
     };
   }, [recipe.audioUrl]);
+  
+  useEffect(() => {
+    setIsImageLoading(!!recipe.imageUrl && !imageError);
+  }, [recipe.imageUrl, imageError]);
+
 
   const handlePrint = () => {
     window.print();
@@ -148,38 +155,62 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
     </AlertDialog>
   );
 
+  const renderImageContent = () => {
+    if (isFetchingDetails) {
+        return (
+            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
+                <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
+                <p>កំពុង​ទាញ​យក​រូបភាព...</p>
+            </div>
+        );
+    }
+    if (imageError) {
+        return (
+            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
+                <ImageOff className="h-8 w-8 mb-2 text-destructive" />
+                <p>មិនអាចផ្ទុករូបភាពបានទេ។</p>
+            </div>
+        );
+    }
+    if (recipe.imageUrl) {
+        return (
+            <>
+                {isImageLoading && (
+                    <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
+                        <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
+                        <p>កំពុង​ផ្ទុក​រូបភាព...</p>
+                    </div>
+                )}
+                <Image
+                    src={recipe.imageUrl}
+                    alt={recipe.recipeName}
+                    fill
+                    objectFit="cover"
+                    data-ai-hint="gourmet food"
+                    className="bg-muted transition-opacity duration-300"
+                    onLoad={() => setIsImageLoading(false)}
+                    onError={() => {
+                        setIsImageLoading(false);
+                        setImageError(true);
+                    }}
+                />
+            </>
+        );
+    }
+    return (
+        <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
+            <ImageOff className="h-8 w-8 mb-2" />
+            <p>មិនមានរូបភាពទេ។</p>
+        </div>
+    );
+  };
+
+
   return (
     <div className="w-full overflow-hidden printable-area">
       <CardHeader className="p-0">
         <div className="relative h-64 w-full">
-          {recipe.imageUrl ? (
-            <>
-              {isImageLoading && (
-                <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-                  <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
-                  <p>កំពុង​ទាញ​យក​រូបភាព...</p>
-                </div>
-              )}
-              <Image
-                src={recipe.imageUrl}
-                alt={recipe.recipeName}
-                fill
-                objectFit="cover"
-                data-ai-hint="gourmet food"
-                className="bg-muted"
-                onLoad={() => setIsImageLoading(false)}
-                onError={() => {
-                  setIsImageLoading(false);
-                  // Optionally handle image loading error, e.g., set a placeholder
-                }}
-              />
-            </>
-          ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-              <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
-              <p>កំពុងបង្កើតរូបភាព ......</p>
-            </div>
-          )}
+          {renderImageContent()}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-0 left-0 p-6">
             <CardTitle className="font-headline text-3xl font-bold text-white">
