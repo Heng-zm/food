@@ -345,24 +345,25 @@ const suggestRecipeAndDetailsFlow = __TURBOPACK__imported__module__$5b$project$5
     outputSchema: SuggestRecipeAndDetailsOutputSchema
 }, async (input)=>{
     const suggestionResult = await suggestRecipeFlow(input);
-    const recipesWithDetails = await Promise.all(suggestionResult.recipes.map(async (recipe)=>{
+    const recipesWithDetails = [];
+    for (const recipe of suggestionResult.recipes){
         try {
             const details = await getRecipeDetailsFlow({
                 recipeName: recipe.recipeName
             });
-            return {
+            recipesWithDetails.push({
                 ...recipe,
                 imageUrl: details.imageUrl
-            };
+            });
         } catch (error) {
             console.error(`Failed to get details for ${recipe.recipeName}`, error);
             // Return the recipe with a placeholder if fetching fails
-            return {
+            recipesWithDetails.push({
                 ...recipe,
                 imageUrl: "https://placehold.co/600x400.png"
-            };
+            });
         }
-    }));
+    }
     return {
         recipes: recipesWithDetails
     };

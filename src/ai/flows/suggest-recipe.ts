@@ -137,19 +137,18 @@ const suggestRecipeAndDetailsFlow = ai.defineFlow(
   },
   async (input) => {
     const suggestionResult = await suggestRecipeFlow(input);
+    const recipesWithDetails: Recipe[] = [];
 
-    const recipesWithDetails = await Promise.all(
-      suggestionResult.recipes.map(async (recipe) => {
-        try {
-          const details = await getRecipeDetailsFlow({ recipeName: recipe.recipeName });
-          return { ...recipe, imageUrl: details.imageUrl };
-        } catch (error) {
-          console.error(`Failed to get details for ${recipe.recipeName}`, error);
-          // Return the recipe with a placeholder if fetching fails
-          return { ...recipe, imageUrl: "https://placehold.co/600x400.png" };
-        }
-      })
-    );
+    for (const recipe of suggestionResult.recipes) {
+      try {
+        const details = await getRecipeDetailsFlow({ recipeName: recipe.recipeName });
+        recipesWithDetails.push({ ...recipe, imageUrl: details.imageUrl });
+      } catch (error) {
+        console.error(`Failed to get details for ${recipe.recipeName}`, error);
+        // Return the recipe with a placeholder if fetching fails
+        recipesWithDetails.push({ ...recipe, imageUrl: "https://placehold.co/600x400.png" });
+      }
+    }
 
     return { recipes: recipesWithDetails };
   }
