@@ -512,7 +512,7 @@ async function getRecipeSuggestion(data) {
         return {
             success: false,
             data: null,
-            error: `Failed to get recipe suggestion. ${errorMessage}`
+            error: `Failed to get recipe suggestion: ${errorMessage}`
         };
     }
 }
@@ -530,7 +530,7 @@ async function getRecipeDetailsAction(data) {
         return {
             success: false,
             data: null,
-            error: `Failed to get recipe details. ${errorMessage}`
+            error: `Failed to get recipe details: ${errorMessage}`
         };
     }
 }
@@ -548,7 +548,7 @@ async function getAudioForRecipeAction(data) {
         return {
             success: false,
             data: null,
-            error: `Failed to get audio. ${errorMessage}`
+            error: `Failed to get audio: ${errorMessage}`
         };
     }
 }

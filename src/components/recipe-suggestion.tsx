@@ -250,6 +250,12 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     }
   }
 
+  const handleNewSearch = () => {
+    setSelectedRecipe(null);
+    setSuggestedRecipes(null);
+    form.reset();
+  }
+
   const LoadingSkeleton = () => (
     <div className="mt-8 space-y-4">
       {[...Array(5)].map((_, i) => (
@@ -260,106 +266,108 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 
   return (
     <div className="mt-6">
-      <Card>
-        <CardContent className="p-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="ingredients"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>គ្រឿងផ្សំដែលមាន</FormLabel>
-                       <div className="relative">
-                        <FormControl>
-                          <Textarea
-                            placeholder="ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស"
-                            {...field}
-                            rows={4}
-                          />
-                        </FormControl>
-                         <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={toggleListening}
-                          className="absolute bottom-2 right-2"
-                          aria-label={isListening ? 'បញ្ឈប់ការស្តាប់' : 'ចាប់ផ្តើមការស្តាប់'}
-                          disabled={!isSpeechRecognitionSupported}
-                        >
-                          {isListening ? (
-                            <MicOff className="h-5 w-5 text-red-500 animate-pulse" />
-                          ) : (
-                            <Mic className="h-5 w-5 text-primary" />
-                          )}
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="space-y-6">
+      {!suggestedRecipes && !selectedRecipe && (
+        <Card>
+          <CardContent className="p-6">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="cuisine"
+                    name="ingredients"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>ប្រភេទម្ហូប</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormLabel>គ្រឿងផ្សំដែលមាន</FormLabel>
+                         <div className="relative">
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="ជ្រើសរើសប្រភេទម្ហូប" />
-                            </SelectTrigger>
+                            <Textarea
+                              placeholder="ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស"
+                              {...field}
+                              rows={4}
+                            />
                           </FormControl>
-                          <SelectContent>
-                            {cuisineOptions.map((option) => (
-                              <SelectItem key={option} value={option}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                           <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={toggleListening}
+                            className="absolute bottom-2 right-2"
+                            aria-label={isListening ? 'បញ្ឈប់ការស្តាប់' : 'ចាប់ផ្តើមការស្តាប់'}
+                            disabled={!isSpeechRecognitionSupported}
+                          >
+                            {isListening ? (
+                              <MicOff className="h-5 w-5 text-red-500 animate-pulse" />
+                            ) : (
+                              <Mic className="h-5 w-5 text-primary" />
+                            )}
+                          </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  <div className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="cuisine"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>ប្រភេទម្ហូប</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="ជ្រើសរើសប្រភេទម្ហូប" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {cuisineOptions.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-              </div>
-              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90">
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    កំពុងបង្កើត...
-                  </>
-                ) : (
-                  "ណែនាំរូបមន្ត"
-                )}
-              </Button>
-            </form>
-          </Form>
+                <Button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90">
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      កំពុងបង្កើត...
+                    </>
+                  ) : (
+                    "ណែនាំរូបមន្ត"
+                  )}
+                </Button>
+              </form>
+            </Form>
 
-          <div className="mt-8 pt-6 border-t">
-             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                <Sparkles className="h-4 w-4"/>
-                ឬសាកល្បងមុខម្ហូបណាមួយក្នុងចំណោមមុខម្ហូបទាំងនេះ
-            </h3>
-            <div className="flex flex-wrap gap-2">
-                {recommendedDishes.map((dish) => (
-                    <Badge 
-                        key={dish}
-                        variant="outline"
-                        onClick={() => handleRecommendedDishClick(dish)}
-                        className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                        tabIndex={0}
-                    >
-                        {dish}
-                    </Badge>
-                ))}
+            <div className="mt-8 pt-6 border-t">
+               <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                  <Sparkles className="h-4 w-4"/>
+                  ឬសាកល្បងមុខម្ហូបណាមួយក្នុងចំណោមមុខម្ហូបទាំងនេះ
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                  {recommendedDishes.map((dish) => (
+                      <Badge 
+                          key={dish}
+                          variant="outline"
+                          onClick={() => handleRecommendedDishClick(dish)}
+                          className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                          tabIndex={0}
+                      >
+                          {dish}
+                      </Badge>
+                  ))}
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="mt-8">
         {isLoading && <LoadingSkeleton />}
@@ -405,10 +413,10 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
           </Dialog>
         )}
 
-        {suggestedRecipes && selectedRecipe && (
-           <Button variant="outline" onClick={() => setSelectedRecipe(null)} className="mt-4">
+        {suggestedRecipes && (
+           <Button variant="outline" onClick={handleNewSearch} className="mt-4">
              <RefreshCw className="mr-2 h-4 w-4" />
-             ត្រលប់ទៅលទ្ធផល
+             ស្វែងរក​រូបមន្ត​ថ្មី
            </Button>
         )}
       </div>

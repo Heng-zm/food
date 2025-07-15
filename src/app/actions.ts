@@ -21,7 +21,7 @@ export async function getRecipeSuggestion(
   } catch (error) {
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    return { success: false, data: null, error: `Failed to get recipe suggestion. ${errorMessage}` };
+    return { success: false, data: null, error: `Failed to get recipe suggestion: ${errorMessage}` };
   }
 }
 
@@ -34,7 +34,7 @@ export async function getRecipeDetailsAction(
   } catch (error) {
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    return { success: false, data: null, error: `Failed to get recipe details. ${errorMessage}` };
+    return { success: false, data: null, error: `Failed to get recipe details: ${errorMessage}` };
   }
 }
 
@@ -47,6 +47,6 @@ export async function getAudioForRecipeAction(
   } catch (error) {
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    return { success: false, data: null, error: `Failed to get audio. ${errorMessage}` };
+    return { success: false, data: null, error: `Failed to get audio: ${errorMessage}` };
   }
 }
