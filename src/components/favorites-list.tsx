@@ -58,7 +58,7 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
   }
 
   const RecipeDetailView = ({ recipe }: { recipe: Recipe }) => (
-    <ScrollArea className="h-[85vh]">
+    <ScrollArea className="h-[70vh]">
       <RecipeCard 
         recipe={recipe}
         isFavorite={true}

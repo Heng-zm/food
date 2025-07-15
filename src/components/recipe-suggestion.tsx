@@ -245,7 +245,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   );
   
   const RecipeDetailView = ({ recipe }: { recipe: Recipe }) => (
-     <ScrollArea className="h-[85vh]">
+     <ScrollArea className="h-[70vh]">
       <RecipeCard 
         recipe={recipe}
         isFavorite={favorites.some(fav => fav.recipeName === recipe.recipeName)}
