@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Mic, MicOff, Sparkles, ChefHat, RefreshCw, ImageOff } from "lucide-react";
+import { Loader2, Mic, MicOff, Sparkles, RefreshCw, ImageOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 
@@ -192,10 +192,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 
     if (result.success && result.data) {
       setSuggestedRecipes(result.data.recipes);
-      // Eagerly fetch details for all suggested recipes
-      result.data.recipes.forEach(recipe => {
-        fetchDetailsForRecipe(recipe);
-      });
     } else {
       toast({
         variant: "destructive",
@@ -214,12 +210,20 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 
     if (result.success && result.data) {
         const fullRecipe = { ...recipe, imageUrl: result.data.imageUrl };
+        
+        // Update the master list
         setSuggestedRecipes(prev => 
             prev?.map(r => r.recipeName === recipe.recipeName ? fullRecipe : r) || null
         );
+        // Update the selected recipe in the dialog
+        setSelectedRecipe(fullRecipe);
     } else {
         console.error(`Failed to get details for ${recipe.recipeName}:`, result.error);
-        // We can optionally update the state to show an error for this specific card
+        toast({
+          variant: "destructive",
+          title: "មិនអាចផ្ទុករូបភាពបានទេ",
+          description: result.error || "មានបញ្ហាក្នុងការទាញយករូបភាពសម្រាប់រូបមន្តនេះ។",
+        });
     }
     setFetchingRecipeDetails(prev => ({...prev, [recipe.recipeName]: false}));
   };
@@ -229,21 +233,19 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     form.setValue("cuisine", "ខ្មែរ");
     form.handleSubmit(onSubmit)();
   };
+  
+  const handleSelectRecipe = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    fetchDetailsForRecipe(recipe);
+  };
 
   const handleAudioUpdate = (audioUrl: string) => {
-    const updateRecipe = (recipeToUpdate: Recipe) => {
-        if (recipeToUpdate) {
-            const updatedRecipe = { ...recipeToUpdate, audioUrl };
-            setSuggestedRecipes(prev => 
-                prev?.map(r => r.recipeName === recipeToUpdate.recipeName ? updatedRecipe : r) || null
-            );
-            if (selectedRecipe && selectedRecipe.recipeName === recipeToUpdate.recipeName) {
-                setSelectedRecipe(updatedRecipe);
-            }
-        }
-    };
     if (selectedRecipe) {
-        updateRecipe(selectedRecipe);
+        const updatedRecipe = { ...selectedRecipe, audioUrl };
+        setSuggestedRecipes(prev => 
+            prev?.map(r => r.recipeName === selectedRecipe.recipeName ? updatedRecipe : r) || null
+        );
+        setSelectedRecipe(updatedRecipe);
     }
   }
 
@@ -268,17 +270,11 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   );
   
   const renderRecipeThumbnail = (recipe: Recipe) => {
-    const isFetching = fetchingRecipeDetails[recipe.recipeName];
     const hasImage = !!recipe.imageUrl;
 
     return (
       <div className="relative h-40 w-full">
-        {isFetching && !hasImage && (
-            <div className="flex h-full w-full items-center justify-center bg-muted">
-                <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            </div>
-        )}
-        {!isFetching && !hasImage && (
+        {!hasImage && (
             <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
                 <ImageOff className="h-8 w-8" />
             </div>
@@ -426,7 +422,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                 >
                     <Card 
                         className="group cursor-pointer overflow-hidden transition-transform duration-200 hover:-translate-y-1"
-                        onClick={() => setSelectedRecipe(recipe)}
+                        onClick={() => handleSelectRecipe(recipe)}
                     >
                         {renderRecipeThumbnail(recipe)}
                         <CardContent className="p-4">
