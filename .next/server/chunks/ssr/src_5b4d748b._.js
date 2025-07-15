@@ -2499,30 +2499,32 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogContent"], {
                                         className: "max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogHeader"], {
-                                                className: "p-6 pb-0",
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogTitle"], {
-                                                    children: recipe.recipeName
+                                        children: selectedRecipe && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogHeader"], {
+                                                    className: "p-6 pb-0",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogTitle"], {
+                                                        children: selectedRecipe.recipeName
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/recipe-suggestion.tsx",
+                                                        lineNumber: 395,
+                                                        columnNumber: 43
+                                                    }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                    lineNumber: 393,
+                                                    lineNumber: 394,
+                                                    columnNumber: 39
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
+                                                    recipe: selectedRecipe
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/recipe-suggestion.tsx",
+                                                    lineNumber: 397,
                                                     columnNumber: 39
                                                 }, this)
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                lineNumber: 392,
-                                                columnNumber: 35
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
-                                                recipe: recipe
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                lineNumber: 395,
-                                                columnNumber: 35
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                            ]
+                                        }, void 0, true)
+                                    }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
                                         lineNumber: 391,
                                         columnNumber: 31
@@ -2541,42 +2543,44 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                         children: renderRecipeItem(recipe)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                        lineNumber: 400,
+                                        lineNumber: 404,
                                         columnNumber: 31
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerContent"], {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerHeader"], {
-                                                className: "text-left",
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerTitle"], {
-                                                    children: recipe.recipeName
+                                        children: selectedRecipe && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerHeader"], {
+                                                    className: "text-left",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerTitle"], {
+                                                        children: selectedRecipe.recipeName
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/recipe-suggestion.tsx",
+                                                        lineNumber: 411,
+                                                        columnNumber: 41
+                                                    }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                    lineNumber: 405,
-                                                    columnNumber: 39
+                                                    lineNumber: 410,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
+                                                    recipe: selectedRecipe
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/recipe-suggestion.tsx",
+                                                    lineNumber: 413,
+                                                    columnNumber: 37
                                                 }, this)
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                lineNumber: 404,
-                                                columnNumber: 35
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
-                                                recipe: recipe
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                                lineNumber: 407,
-                                                columnNumber: 35
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                            ]
+                                        }, void 0, true)
+                                    }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                        lineNumber: 403,
+                                        lineNumber: 407,
                                         columnNumber: 31
                                     }, this)
                                 ]
                             }, recipe.recipeName, true, {
                                 fileName: "[project]/src/components/recipe-suggestion.tsx",
-                                lineNumber: 399,
+                                lineNumber: 403,
                                 columnNumber: 27
                             }, this))
                     }, void 0, false, {
@@ -2759,30 +2763,32 @@ const FavoritesList = ({ favorites, onToggleFavorite })=>{
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogContent"], {
                             className: "max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogHeader"], {
-                                    className: "p-6 pb-0",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogTitle"], {
-                                        children: recipe.recipeName
+                            children: selectedRecipe && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogHeader"], {
+                                        className: "p-6 pb-0",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogTitle"], {
+                                            children: selectedRecipe.recipeName
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/favorites-list.tsx",
+                                            lineNumber: 98,
+                                            columnNumber: 21
+                                        }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/favorites-list.tsx",
-                                        lineNumber: 96,
+                                        lineNumber: 97,
+                                        columnNumber: 19
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
+                                        recipe: selectedRecipe
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/favorites-list.tsx",
+                                        lineNumber: 100,
                                         columnNumber: 19
                                     }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/favorites-list.tsx",
-                                    lineNumber: 95,
-                                    columnNumber: 16
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
-                                    recipe: recipe
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/favorites-list.tsx",
-                                    lineNumber: 98,
-                                    columnNumber: 16
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                                ]
+                            }, void 0, true)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/favorites-list.tsx",
                             lineNumber: 94,
                             columnNumber: 13
@@ -2810,47 +2816,49 @@ const FavoritesList = ({ favorites, onToggleFavorite })=>{
                         children: renderFavoriteItem(recipe)
                     }, void 0, false, {
                         fileName: "[project]/src/components/favorites-list.tsx",
-                        lineNumber: 110,
+                        lineNumber: 114,
                         columnNumber: 13
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerContent"], {
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerHeader"], {
-                                className: "text-left",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerTitle"], {
-                                    children: recipe.recipeName
+                        children: selectedRecipe && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerHeader"], {
+                                    className: "text-left",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$drawer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DrawerTitle"], {
+                                        children: selectedRecipe.recipeName
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/favorites-list.tsx",
+                                        lineNumber: 121,
+                                        columnNumber: 21
+                                    }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/favorites-list.tsx",
-                                    lineNumber: 115,
-                                    columnNumber: 17
+                                    lineNumber: 120,
+                                    columnNumber: 19
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
+                                    recipe: selectedRecipe
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/favorites-list.tsx",
+                                    lineNumber: 123,
+                                    columnNumber: 19
                                 }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/favorites-list.tsx",
-                                lineNumber: 114,
-                                columnNumber: 15
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RecipeDetailView, {
-                                recipe: recipe
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/favorites-list.tsx",
-                                lineNumber: 117,
-                                columnNumber: 15
-                            }, this)
-                        ]
-                    }, void 0, true, {
+                            ]
+                        }, void 0, true)
+                    }, void 0, false, {
                         fileName: "[project]/src/components/favorites-list.tsx",
-                        lineNumber: 113,
+                        lineNumber: 117,
                         columnNumber: 13
                     }, this)
                 ]
             }, recipe.recipeName, true, {
                 fileName: "[project]/src/components/favorites-list.tsx",
-                lineNumber: 109,
+                lineNumber: 113,
                 columnNumber: 11
             }, this))
     }, void 0, false, {
         fileName: "[project]/src/components/favorites-list.tsx",
-        lineNumber: 107,
+        lineNumber: 111,
         columnNumber: 5
     }, this);
 };

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/drawer";
 import RecipeCard from "@/components/recipe-card";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle as CardTitlePrimitive, CardDescription } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FavoritesListProps {
@@ -74,7 +74,7 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
       onClick={() => handleSelectRecipe(recipe)}
     >
       <CardHeader>
-          <CardTitle className="truncate group-hover:text-accent">{recipe.recipeName}</CardTitle>
+          <CardTitlePrimitive className="truncate group-hover:text-accent">{recipe.recipeName}</CardTitlePrimitive>
           <CardDescription>{recipe.estimatedCookingTime}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -92,10 +92,14 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
               {renderFavoriteItem(recipe)}
             </DialogTrigger>
             <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
-               <DialogHeader className="p-6 pb-0">
-                  <DialogTitle>{recipe.recipeName}</DialogTitle>
-               </DialogHeader>
-               <RecipeDetailView recipe={recipe} />
+              {selectedRecipe && (
+                <>
+                  <DialogHeader className="p-6 pb-0">
+                    <DialogTitle>{selectedRecipe.recipeName}</DialogTitle>
+                  </DialogHeader>
+                  <RecipeDetailView recipe={selectedRecipe} />
+                </>
+              )}
             </DialogContent>
           </Dialog>
         ))}
@@ -111,10 +115,14 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
                {renderFavoriteItem(recipe)}
             </DrawerTrigger>
             <DrawerContent>
-              <DrawerHeader className="text-left">
-                <DrawerTitle>{recipe.recipeName}</DrawerTitle>
-              </DrawerHeader>
-              <RecipeDetailView recipe={recipe} />
+              {selectedRecipe && (
+                <>
+                  <DrawerHeader className="text-left">
+                    <DrawerTitle>{selectedRecipe.recipeName}</DrawerTitle>
+                  </DrawerHeader>
+                  <RecipeDetailView recipe={selectedRecipe} />
+                </>
+              )}
             </DrawerContent>
           </Drawer>
         ))}

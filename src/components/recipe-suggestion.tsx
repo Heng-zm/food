@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle as CardTitlePrimitive } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RecipeCard from "@/components/recipe-card";
@@ -260,7 +260,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
       onClick={() => handleSelectRecipe(recipe)}
     >
       <CardHeader>
-          <CardTitle className="truncate group-hover:text-accent">{recipe.recipeName}</CardTitle>
+          <CardTitlePrimitive className="truncate group-hover:text-accent">{recipe.recipeName}</CardTitlePrimitive>
           <CardDescription>{recipe.estimatedCookingTime}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -389,10 +389,14 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                                   {renderRecipeItem(recipe)}
                               </DialogTrigger>
                               <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
-                                  <DialogHeader className="p-6 pb-0">
-                                      <DialogTitle>{recipe.recipeName}</DialogTitle>
-                                  </DialogHeader>
-                                  <RecipeDetailView recipe={recipe} />
+                                  {selectedRecipe && (
+                                    <>
+                                      <DialogHeader className="p-6 pb-0">
+                                          <DialogTitle>{selectedRecipe.recipeName}</DialogTitle>
+                                      </DialogHeader>
+                                      <RecipeDetailView recipe={selectedRecipe} />
+                                    </>
+                                  )}
                               </DialogContent>
                           </Dialog>
                       ) : (
@@ -401,10 +405,14 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                                   {renderRecipeItem(recipe)}
                               </DrawerTrigger>
                               <DrawerContent>
-                                  <DrawerHeader className="text-left">
-                                      <DrawerTitle>{recipe.recipeName}</DrawerTitle>
-                                  </DrawerHeader>
-                                  <RecipeDetailView recipe={recipe} />
+                                {selectedRecipe && (
+                                  <>
+                                    <DrawerHeader className="text-left">
+                                        <DrawerTitle>{selectedRecipe.recipeName}</DrawerTitle>
+                                    </DrawerHeader>
+                                    <RecipeDetailView recipe={selectedRecipe} />
+                                  </>
+                                )}
                               </DrawerContent>
                           </Drawer>
                       )
