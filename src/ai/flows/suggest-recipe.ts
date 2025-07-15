@@ -105,9 +105,20 @@ const getRecipeDetailsFlow = ai.defineFlow(
     outputSchema: GetRecipeDetailsOutputSchema,
   },
   async ({ recipeName }) => {
-    const imageUrl = `https://placehold.co/600x400.png`;
+    const { media } = await ai.generate({
+      model: 'googleai/gemini-2.0-flash-preview-image-generation',
+      prompt: `Generate a photorealistic image of a khmer food dish: ${recipeName}. The image should be beautifully plated, well-lit, and look delicious.`,
+      config: {
+        responseModalities: ['TEXT', 'IMAGE'],
+      },
+    });
+
+    if (!media.url) {
+      throw new Error('Image generation failed.');
+    }
+    
     return {
-      imageUrl: imageUrl,
+      imageUrl: media.url,
     };
   }
 );
