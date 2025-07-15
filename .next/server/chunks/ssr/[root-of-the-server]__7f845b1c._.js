@@ -432,7 +432,7 @@ const getRecipeDetailsFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src
     inputSchema: GetRecipeDetailsInputSchema,
     outputSchema: GetRecipeDetailsOutputSchema
 }, async ({ recipeName })=>{
-    const imageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(recipeName)}`;
+    const imageUrl = `https://placehold.co/600x400.png`;
     return {
         imageUrl: imageUrl
     };
