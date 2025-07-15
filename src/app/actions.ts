@@ -10,8 +10,8 @@ export async function getRecipeSuggestion(
   data: SuggestRecipeInput
 ): Promise<{ success: boolean; data: SuggestRecipeAndDetailsOutput | null; error: string | null; }> {
   try {
-    const recipe = await suggestRecipeAndDetails(data);
-    return { success: true, data: recipe, error: null };
+    const result = await suggestRecipeAndDetails(data);
+    return { success: true, data: result, error: null };
   } catch (error) {
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';

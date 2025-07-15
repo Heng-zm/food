@@ -7,10 +7,10 @@
  *
  * - suggestRecipe - A function that suggests recipes based on available ingredients and desired cuisine.
  * - getRecipeDetails - A function that gets the image for a specific recipe.
- * - suggestRecipeAndDetails - A function that suggests recipes and fetches their details (images).
+ * - suggestRecipeAndDetails - A function that suggests a recipe and fetches its details (image).
  * - SuggestRecipeInput - The input type for the suggestRecipe function.
  * - Recipe - A single recipe object.
- * - SuggestRecipeOutput - The return type for the suggestRecipe function.
+ * - SuggestRecipeAndDetailsOutput - The return type for the suggestRecipeAndDetails function.
  * - GetRecipeDetailsInput - The input type for the getRecipeDetails function.
  * - GetRecipeDetailsOutput - The return type for the getRecipeDetails function.
  */
@@ -23,6 +23,7 @@ const SuggestRecipeInputSchema = z.object({
     .string()
     .describe('បញ្ជីគ្រឿងផ្សំដែលមាន រាយដោយមានសញ្ញាក្បៀស។'),
   cuisine: z.string().describe('ប្រភេទម្ហូបដែលចង់បាន (ឧ. ខ្មែរ, អ៊ីតាលី)។'),
+  excludeRecipes: z.array(z.string()).optional().describe('បញ្ជីឈ្មោះរូបមន្តដែលត្រូវដកចេញពីលទ្ធផល។'),
 });
 export type SuggestRecipeInput = z.infer<typeof SuggestRecipeInputSchema>;
 
@@ -36,12 +37,12 @@ const RecipeSchema = z.object({
 export type Recipe = z.infer<typeof RecipeSchema>;
 
 const SuggestRecipeOutputSchema = z.object({
-  recipes: z.array(RecipeSchema.omit({ imageUrl: true })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ។'),
+    recipe: RecipeSchema.omit({ imageUrl: true })
 });
 export type SuggestRecipeOutput = z.infer<typeof SuggestRecipeOutputSchema>;
 
 const SuggestRecipeAndDetailsOutputSchema = z.object({
-    recipes: z.array(RecipeSchema).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ជាមួយរូបភាព។'),
+    recipe: RecipeSchema.describe('The suggested recipe with its image.'),
 });
 export type SuggestRecipeAndDetailsOutput = z.infer<typeof SuggestRecipeAndDetailsOutputSchema>;
 
@@ -57,16 +58,20 @@ const recipePrompt = ai.definePrompt({
     format: 'json',
     schema: SuggestRecipeOutputSchema,
   },
-  prompt: `អ្នកគឺជាចុងភៅលំដាប់ពិភពលោក ដែលមានជំនាញក្នុងការបង្កើតរូបមន្តឆ្ងាញ់ៗ ដោយផ្អែកលើគ្រឿងផ្សំដែលមាន និងចំណូលចិត្តម្ហូប។
+  prompt: `You are a world-class chef specializing in creating delicious recipes based on available ingredients and cuisine preferences.
 
-  សូមផ្តល់ការឆ្លើយតបទាំងមូលជាភាសាខ្មែរ (កម្ពុជា)។
+  Please provide the entire response in Khmer (Cambodia).
 
-  ដោយផ្អែកលើគ្រឿងផ្សំ និងម្ហូបដែលបានផ្តល់ សូមណែនាំរូបមន្តលម្អិតចំនួន 5 ។
+  Based on the provided ingredients and cuisine, suggest one single, excellent, detailed recipe.
+  
+  {{#if excludeRecipes}}
+  Do not suggest any of the following recipes: {{#each excludeRecipes}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}.
+  {{/if}}
 
-  គ្រឿងផ្សំ៖ {{{ingredients}}}
-  ម្ហូប៖ {{{cuisine}}}
+  Ingredients: {{{ingredients}}}
+  Cuisine: {{{cuisine}}}
 
-  ត្រូវប្រាកដថាការឆ្លើយតបរបស់អ្នកជាទម្រង់ JSON ដែលអាចញែកបាន ដែលគោរពតាម schema ដែលបានផ្តល់ឱ្យ។
+  Ensure your response is a parsable JSON object that adheres to the provided schema.
 `,
 });
 
@@ -137,19 +142,20 @@ const suggestRecipeAndDetailsFlow = ai.defineFlow(
   },
   async (input) => {
     const suggestionResult = await suggestRecipeFlow(input);
-    const recipesWithDetails: Recipe[] = [];
-
-    for (const recipe of suggestionResult.recipes) {
-      try {
-        const details = await getRecipeDetailsFlow({ recipeName: recipe.recipeName });
-        recipesWithDetails.push({ ...recipe, imageUrl: details.imageUrl });
-      } catch (error) {
-        console.error(`Failed to get details for ${recipe.recipeName}`, error);
-        // Return the recipe with a placeholder if fetching fails
-        recipesWithDetails.push({ ...recipe, imageUrl: "https://placehold.co/600x400.png" });
-      }
+    
+    if (!suggestionResult || !suggestionResult.recipe) {
+      throw new Error("Failed to get a recipe suggestion.");
     }
+    
+    const recipe = suggestionResult.recipe;
 
-    return { recipes: recipesWithDetails };
+    try {
+      const details = await getRecipeDetailsFlow({ recipeName: recipe.recipeName });
+      return { recipe: { ...recipe, imageUrl: details.imageUrl } };
+    } catch (error) {
+      console.error(`Failed to get details for ${recipe.recipeName}`, error);
+      // Return the recipe with a placeholder if fetching fails
+      return { recipe: { ...recipe, imageUrl: "https://placehold.co/600x400.png" } };
+    }
   }
 );

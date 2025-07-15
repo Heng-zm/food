@@ -239,10 +239,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
  *
  * - suggestRecipe - A function that suggests recipes based on available ingredients and desired cuisine.
  * - getRecipeDetails - A function that gets the image for a specific recipe.
- * - suggestRecipeAndDetails - A function that suggests recipes and fetches their details (images).
+ * - suggestRecipeAndDetails - A function that suggests a recipe and fetches its details (image).
  * - SuggestRecipeInput - The input type for the suggestRecipe function.
  * - Recipe - A single recipe object.
- * - SuggestRecipeOutput - The return type for the suggestRecipe function.
+ * - SuggestRecipeAndDetailsOutput - The return type for the suggestRecipeAndDetails function.
  * - GetRecipeDetailsInput - The input type for the getRecipeDetails function.
  * - GetRecipeDetailsOutput - The return type for the getRecipeDetails function.
  */ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/ai/genkit.ts [app-rsc] (ecmascript)");
@@ -255,7 +255,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 const SuggestRecipeInputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
     ingredients: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('បញ្ជីគ្រឿងផ្សំដែលមាន រាយដោយមានសញ្ញាក្បៀស។'),
-    cuisine: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ប្រភេទម្ហូបដែលចង់បាន (ឧ. ខ្មែរ, អ៊ីតាលី)។')
+    cuisine: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ប្រភេទម្ហូបដែលចង់បាន (ឧ. ខ្មែរ, អ៊ីតាលី)។'),
+    excludeRecipes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string()).optional().describe('បញ្ជីឈ្មោះរូបមន្តដែលត្រូវដកចេញពីលទ្ធផល។')
 });
 const RecipeSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
     recipeName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
@@ -265,12 +266,12 @@ const RecipeSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_module
     imageUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().optional().describe('URL នៃរូបភាពនៃរូបមន្ត។')
 });
 const SuggestRecipeOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
-    recipes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].array(RecipeSchema.omit({
+    recipe: RecipeSchema.omit({
         imageUrl: true
-    })).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ។')
+    })
 });
 const SuggestRecipeAndDetailsOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
-    recipes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].array(RecipeSchema).describe('បញ្ជីរូបមន្តដែលបានណែនាំចំនួន 5 ជាមួយរូបភាព។')
+    recipe: RecipeSchema.describe('The suggested recipe with its image.')
 });
 async function suggestRecipe(input) {
     return suggestRecipeFlow(input);
@@ -284,16 +285,20 @@ const recipePrompt = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2
         format: 'json',
         schema: SuggestRecipeOutputSchema
     },
-    prompt: `អ្នកគឺជាចុងភៅលំដាប់ពិភពលោក ដែលមានជំនាញក្នុងការបង្កើតរូបមន្តឆ្ងាញ់ៗ ដោយផ្អែកលើគ្រឿងផ្សំដែលមាន និងចំណូលចិត្តម្ហូប។
+    prompt: `You are a world-class chef specializing in creating delicious recipes based on available ingredients and cuisine preferences.
 
-  សូមផ្តល់ការឆ្លើយតបទាំងមូលជាភាសាខ្មែរ (កម្ពុជា)។
+  Please provide the entire response in Khmer (Cambodia).
 
-  ដោយផ្អែកលើគ្រឿងផ្សំ និងម្ហូបដែលបានផ្តល់ សូមណែនាំរូបមន្តលម្អិតចំនួន 5 ។
+  Based on the provided ingredients and cuisine, suggest one single, excellent, detailed recipe.
+  
+  {{#if excludeRecipes}}
+  Do not suggest any of the following recipes: {{#each excludeRecipes}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}.
+  {{/if}}
 
-  គ្រឿងផ្សំ៖ {{{ingredients}}}
-  ម្ហូប៖ {{{cuisine}}}
+  Ingredients: {{{ingredients}}}
+  Cuisine: {{{cuisine}}}
 
-  ត្រូវប្រាកដថាការឆ្លើយតបរបស់អ្នកជាទម្រង់ JSON ដែលអាចញែកបាន ដែលគោរពតាម schema ដែលបានផ្តល់ឱ្យ។
+  Ensure your response is a parsable JSON object that adheres to the provided schema.
 `
 });
 const suggestRecipeFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ai"].defineFlow({
@@ -345,28 +350,30 @@ const suggestRecipeAndDetailsFlow = __TURBOPACK__imported__module__$5b$project$5
     outputSchema: SuggestRecipeAndDetailsOutputSchema
 }, async (input)=>{
     const suggestionResult = await suggestRecipeFlow(input);
-    const recipesWithDetails = [];
-    for (const recipe of suggestionResult.recipes){
-        try {
-            const details = await getRecipeDetailsFlow({
-                recipeName: recipe.recipeName
-            });
-            recipesWithDetails.push({
+    if (!suggestionResult || !suggestionResult.recipe) {
+        throw new Error("Failed to get a recipe suggestion.");
+    }
+    const recipe = suggestionResult.recipe;
+    try {
+        const details = await getRecipeDetailsFlow({
+            recipeName: recipe.recipeName
+        });
+        return {
+            recipe: {
                 ...recipe,
                 imageUrl: details.imageUrl
-            });
-        } catch (error) {
-            console.error(`Failed to get details for ${recipe.recipeName}`, error);
-            // Return the recipe with a placeholder if fetching fails
-            recipesWithDetails.push({
+            }
+        };
+    } catch (error) {
+        console.error(`Failed to get details for ${recipe.recipeName}`, error);
+        // Return the recipe with a placeholder if fetching fails
+        return {
+            recipe: {
                 ...recipe,
                 imageUrl: "https://placehold.co/600x400.png"
-            });
-        }
+            }
+        };
     }
-    return {
-        recipes: recipesWithDetails
-    };
 });
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
@@ -395,10 +402,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 async function getRecipeSuggestion(data) {
     try {
-        const recipe = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$suggest$2d$recipe$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["suggestRecipeAndDetails"])(data);
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$suggest$2d$recipe$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["suggestRecipeAndDetails"])(data);
         return {
             success: true,
-            data: recipe,
+            data: result,
             error: null
         };
     } catch (error) {

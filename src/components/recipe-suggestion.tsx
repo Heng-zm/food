@@ -5,10 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Mic, MicOff, Sparkles, RefreshCw, ImageOff } from "lucide-react";
+import { Loader2, Mic, MicOff, Sparkles, RefreshCw, ChefHat } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import Image from "next/image";
-import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,12 +25,7 @@ import RecipeCard from "@/components/recipe-card";
 import { getRecipeSuggestion } from "@/app/actions";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import {
   Drawer,
   DrawerContent,
@@ -85,14 +78,14 @@ const allRecommendedDishes = [
 
 const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [suggestedRecipes, setSuggestedRecipes] = useState<Recipe[] | null>(null);
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [suggestedRecipe, setSuggestedRecipe] = useState<Recipe | null>(null);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
   const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
   const [recommendedDishes, setRecommendedDishes] = useState<string[]>([]);
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [excludedRecipes, setExcludedRecipes] = useState<string[]>([]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -191,254 +184,249 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     }
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const handleSuggestionRequest = async (values: z.infer<typeof formSchema>, isNewRequest: boolean = true) => {
     setIsLoading(true);
-    setSuggestedRecipes(null);
-    setSelectedRecipe(null);
-    const result = await getRecipeSuggestion(values);
+    
+    // If it's a brand new search, clear the old recipe and exclusion list
+    if (isNewRequest) {
+      setSuggestedRecipe(null);
+      setExcludedRecipes([]);
+    }
+
+    const result = await getRecipeSuggestion({ 
+      ...values, 
+      excludeRecipes: isNewRequest ? [] : excludedRecipes 
+    });
+    
     setIsLoading(false);
 
-    if (result.success && result.data) {
-      setSuggestedRecipes(result.data.recipes);
+    if (result.success && result.data?.recipe) {
+      const newRecipe = result.data.recipe;
+      setSuggestedRecipe(newRecipe);
+      // Add the new recipe to the exclusion list for the next request
+      setExcludedRecipes(prev => [...prev, newRecipe.recipeName]);
     } else {
       toast({
         variant: "destructive",
         title: "មានបញ្ហាអ្វីមួយកើតឡើង!",
-        description: result.error || "មានបញ្ហាជាមួយសំណើរបស់អ្នក។",
+        description: result.error || "មានបញ្ហាជាមួយសំណើរបស់អ្នក។ សូមសាកល្បងម្ដងទៀត។",
       });
+      if (!isNewRequest) {
+        // If getting another suggestion fails, don't clear the current one
+        setIsLoading(false);
+      }
     }
   }
-  
+
   const handleRecommendedDishClick = (dish: string) => {
     form.setValue("ingredients", dish);
     form.setValue("cuisine", "ខ្មែរ");
-    form.handleSubmit(onSubmit)();
-  };
-  
-  const handleSelectRecipe = (recipe: Recipe) => {
-    setSelectedRecipe(recipe);
+    handleSuggestionRequest(form.getValues(), true);
   };
 
   const handleNewSearch = () => {
-    setSelectedRecipe(null);
-    setSuggestedRecipes(null);
+    setSuggestedRecipe(null);
+    setExcludedRecipes([]);
     form.reset();
   }
 
+  const handleTryAnother = () => {
+    const values = form.getValues();
+    if (values.ingredients && values.cuisine) {
+      handleSuggestionRequest(values, false);
+    } else {
+       toast({
+        variant: "destructive",
+        title: "ត្រូវការគ្រឿងផ្សំ",
+        description: "សូមប្រាកដថាអ្នកបានបញ្ចូលគ្រឿងផ្សំ និងប្រភេទម្ហូប។",
+      });
+    }
+  }
+
   const LoadingSkeleton = () => (
-    <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {[...Array(5)].map((_, i) => (
-        <Card key={i}>
-            <Skeleton className="h-40 w-full" />
-            <CardContent className="p-4">
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-1/2" />
-            </CardContent>
-        </Card>
-      ))}
+    <div className="mt-8">
+      <Card>
+        <Skeleton className="h-64 w-full" />
+        <CardContent className="p-6">
+            <Skeleton className="h-8 w-3/4 mb-4" />
+            <div className="flex gap-4 mb-6">
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-6 w-32" />
+            </div>
+            <Skeleton className="h-px w-full mb-6" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <Skeleton className="h-6 w-1/3 mb-4" />
+                <Skeleton className="h-5 w-full mb-2" />
+                <Skeleton className="h-5 w-5/6 mb-2" />
+                <Skeleton className="h-5 w-full" />
+              </div>
+               <div>
+                <Skeleton className="h-6 w-1/3 mb-4" />
+                <Skeleton className="h-5 w-full mb-2" />
+                <Skeleton className="h-5 w-5/6 mb-2" />
+                <Skeleton className="h-5 w-full" />
+              </div>
+            </div>
+        </CardContent>
+      </Card>
     </div>
   );
   
-  const renderRecipeThumbnail = (recipe: Recipe) => {
-    return (
-      <div className="relative h-40 w-full">
-        {recipe.imageUrl ? (
-             <Image
-                src={recipe.imageUrl}
-                alt={recipe.recipeName}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                style={{ objectFit: 'cover' }}
-                data-ai-hint="gourmet food"
-                className="transition-transform duration-300 group-hover:scale-105"
-            />
-        ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        )}
-         <div className="absolute inset-0 bg-black/30" />
-      </div>
-    );
-  }
+  const RecipeDetailView = () => {
+    if (!suggestedRecipe) return null;
 
-  const RecipeDetailView = ({ recipe }: { recipe: Recipe }) => {
     return (
       <div className="max-h-[85vh] overflow-y-auto">
         <RecipeCard
-          recipe={recipe}
-          isFavorite={favorites.some(fav => fav.recipeName === recipe.recipeName)}
+          recipe={suggestedRecipe}
+          isFavorite={favorites.some(fav => fav.recipeName === suggestedRecipe.recipeName)}
           onToggleFavorite={onToggleFavorite}
         />
       </div>
     );
   };
-
-  return (
-    <div className="mt-6">
-      {!suggestedRecipes && (
-        <Card>
-          <CardContent className="p-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+  
+  const renderInitialView = () => (
+     <Card>
+        <CardContent className="p-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit((values) => handleSuggestionRequest(values, true))} className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="ingredients"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>គ្រឿងផ្សំដែលមាន</FormLabel>
+                       <div className="relative">
+                        <FormControl>
+                          <Textarea
+                            placeholder="ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស"
+                            {...field}
+                            rows={4}
+                          />
+                        </FormControl>
+                         <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={toggleListening}
+                          className="absolute bottom-2 right-2"
+                          aria-label={isListening ? 'បញ្ឈប់ការស្តាប់' : 'ចាប់ផ្តើមការស្តាប់'}
+                          disabled={!isSpeechRecognitionSupported}
+                        >
+                          {isListening ? (
+                            <MicOff className="h-5 w-5 text-red-500 animate-pulse" />
+                          ) : (
+                            <Mic className="h-5 w-5 text-primary" />
+                          )}
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="ingredients"
+                    name="cuisine"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>គ្រឿងផ្សំដែលមាន</FormLabel>
-                         <div className="relative">
+                        <FormLabel>ប្រភេទម្ហូប</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <Textarea
-                              placeholder="ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស"
-                              {...field}
-                              rows={4}
-                            />
+                            <SelectTrigger>
+                              <SelectValue placeholder="ជ្រើសរើសប្រភេទម្ហូប" />
+                            </SelectTrigger>
                           </FormControl>
-                           <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={toggleListening}
-                            className="absolute bottom-2 right-2"
-                            aria-label={isListening ? 'បញ្ឈប់ការស្តាប់' : 'ចាប់ផ្តើមការស្តាប់'}
-                            disabled={!isSpeechRecognitionSupported}
-                          >
-                            {isListening ? (
-                              <MicOff className="h-5 w-5 text-red-500 animate-pulse" />
-                            ) : (
-                              <Mic className="h-5 w-5 text-primary" />
-                            )}
-                          </Button>
-                        </div>
+                          <SelectContent>
+                            {cuisineOptions.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <div className="space-y-6">
-                    <FormField
-                      control={form.control}
-                      name="cuisine"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>ប្រភេទម្ហូប</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="ជ្រើសរើសប្រភេទម្ហូប" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {cuisineOptions.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
                 </div>
-                <Button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90">
-                  {isLoading ? (
+              </div>
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    កំពុងបង្កើត...
+                  </>
+                ) : (
+                   <>
+                    <ChefHat className="mr-2 h-4 w-4" />
+                    ណែនាំរូបមន្ត
+                   </>
+                )}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="mt-8 pt-6 border-t">
+             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <Sparkles className="h-4 w-4"/>
+                ឬសាកល្បងមុខម្ហូបណាមួយក្នុងចំណោមមុខម្ហូបទាំងនេះ
+            </h3>
+            <div className="flex flex-wrap gap-2">
+                {recommendedDishes.map((dish) => (
+                    <Badge 
+                        key={dish}
+                        variant="outline"
+                        onClick={() => handleRecommendedDishClick(dish)}
+                        className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                        tabIndex={0}
+                    >
+                        {dish}
+                    </Badge>
+                ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+  );
+
+  const renderResultView = () => (
+     <>
+      <div className="mb-6 flex flex-col items-center gap-4 text-center md:flex-row md:justify-between">
+          <div>
+              <h2 className="font-headline text-2xl font-bold md:text-3xl">លទ្ធផលរូបមន្ត</h2>
+              <p className="text-muted-foreground">នេះគឺជាមុខម្ហូបដែលអ្នកអាចធ្វើបាន</p>
+          </div>
+          <div className="flex gap-2">
+             <Button variant="outline" onClick={handleNewSearch}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  ស្វែងរក​រូបមន្ត​ថ្មី
+              </Button>
+              <Button onClick={handleTryAnother} disabled={isLoading} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                 {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      កំពុងបង្កើត...
                     </>
                   ) : (
-                    "ណែនាំរូបមន្ត"
+                    "សាកល្បងម្ហូបផ្សេង"
                   )}
-                </Button>
-              </form>
-            </Form>
-
-            <div className="mt-8 pt-6 border-t">
-               <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                  <Sparkles className="h-4 w-4"/>
-                  ឬសាកល្បងមុខម្ហូបណាមួយក្នុងចំណោមមុខម្ហូបទាំងនេះ
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                  {recommendedDishes.map((dish) => (
-                      <Badge 
-                          key={dish}
-                          variant="outline"
-                          onClick={() => handleRecommendedDishClick(dish)}
-                          className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                          tabIndex={0}
-                      >
-                          {dish}
-                      </Badge>
-                  ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="mt-8">
-        {isLoading && <LoadingSkeleton />}
-        {suggestedRecipes && (
-            <>
-            <div className="mb-6 flex flex-col items-center gap-4 text-center md:flex-row md:justify-between">
-                <div>
-                    <h2 className="font-headline text-2xl font-bold md:text-3xl">លទ្ធផលរូបមន្ត</h2>
-                    <p className="text-muted-foreground">នេះគឺជាមុខម្ហូបមួយចំនួនដែលអ្នកអាចធ្វើបាន</p>
-                </div>
-                <Button variant="outline" onClick={handleNewSearch}>
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    ស្វែងរក​រូបមន្ត​ថ្មី
-                </Button>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {suggestedRecipes.map((recipe, index) => (
-                <div
-                    key={recipe.recipeName}
-                    className="animate-in fade-in-0 zoom-in-95"
-                    style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
-                >
-                    <Card 
-                        className="group cursor-pointer overflow-hidden transition-transform duration-200 hover:-translate-y-1"
-                        onClick={() => handleSelectRecipe(recipe)}
-                    >
-                        {renderRecipeThumbnail(recipe)}
-                        <CardContent className="p-4">
-                            <h3 className="font-headline text-lg font-semibold truncate">{recipe.recipeName}</h3>
-                            <p className="text-sm text-muted-foreground truncate">{recipe.estimatedCookingTime}</p>
-                        </CardContent>
-                    </Card>
-                </div>
-              ))}
-            </div>
-            </>
-        )}
-        
-        {selectedRecipe && (
-          isDesktop ? (
-            <Dialog open={!!selectedRecipe} onOpenChange={(open) => !open && setSelectedRecipe(null)}>
-              <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
-                <DialogHeader className="p-6 pb-0">
-                  <DialogTitle>{selectedRecipe.recipeName}</DialogTitle>
-                </DialogHeader>
-                <RecipeDetailView recipe={selectedRecipe} />
-              </DialogContent>
-            </Dialog>
-          ) : (
-            <Drawer open={!!selectedRecipe} onOpenChange={(open) => !open && setSelectedRecipe(null)}>
-              <DrawerContent>
-                <DrawerHeader className="text-left">
-                  <DrawerTitle>{selectedRecipe.recipeName}</DrawerTitle>
-                </DrawerHeader>
-                <RecipeDetailView recipe={selectedRecipe} />
-              </DrawerContent>
-            </Drawer>
-          )
-        )}
-
+              </Button>
+          </div>
       </div>
+      <div className="animate-in fade-in-0 zoom-in-95">
+        <RecipeDetailView />
+      </div>
+    </>
+  );
+
+  return (
+    <div className="mt-6">
+      {!suggestedRecipe && !isLoading && renderInitialView()}
+      {isLoading && <LoadingSkeleton />}
+      {suggestedRecipe && !isLoading && renderResultView()}
     </div>
   );
 };
