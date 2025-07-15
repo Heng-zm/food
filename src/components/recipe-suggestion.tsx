@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RecipeCard from "@/components/recipe-card";
@@ -229,10 +229,15 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 3 }).map((_, index) => (
         <Card key={index}>
-            <CardContent className="p-4">
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-1/2" />
-            </CardContent>
+          <CardHeader>
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/2" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-4 w-full mb-1" />
+            <Skeleton className="h-4 w-full mb-1" />
+            <Skeleton className="h-4 w-3/5" />
+          </CardContent>
         </Card>
       ))}
     </div>
@@ -249,15 +254,18 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   );
 
   const renderRecipeItem = (recipe: Recipe) => (
-      <div 
-        className="group cursor-pointer overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-transform duration-200 hover:-translate-y-1"
-        onClick={() => handleSelectRecipe(recipe)}
-      >
-        <div className="p-4">
-          <h3 className="font-headline text-lg font-semibold truncate">{recipe.recipeName}</h3>
-          <p className="text-sm text-muted-foreground truncate">{recipe.estimatedCookingTime}</p>
-        </div>
-      </div>
+    <Card 
+      className="group cursor-pointer overflow-hidden transition-transform duration-200 hover:-translate-y-1"
+      onClick={() => handleSelectRecipe(recipe)}
+    >
+      <CardHeader>
+          <CardTitle className="truncate group-hover:text-accent">{recipe.recipeName}</CardTitle>
+          <CardDescription>{recipe.estimatedCookingTime}</CardDescription>
+      </CardHeader>
+      <CardContent>
+          <p className="text-muted-foreground text-sm line-clamp-3">{recipe.description}</p>
+      </CardContent>
+    </Card>
   );
   
   return (

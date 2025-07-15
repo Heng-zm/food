@@ -28,6 +28,7 @@ export type SuggestRecipesInput = z.infer<typeof SuggestRecipesInputSchema>;
 // Schema for a single recipe
 const RecipeSchema = z.object({
   recipeName: z.string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
+  description: z.string().describe('ការពិពណ៌នាសង្ខេប និងទាក់ទាញអំពីម្ហូប (១-២ ប្រយោគ)។'),
   ingredients: z.string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។ បំបែកធាតុនីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
   instructions: z.string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។ បំបែកជំហាននីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
   estimatedCookingTime: z.string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
@@ -58,7 +59,7 @@ const recipePrompt = ai.definePrompt({
 
   Please provide the entire response in Khmer (Cambodia).
 
-  Based on the provided ingredients and cuisine, suggest 5 distinct, excellent, detailed recipes.
+  Based on the provided ingredients and cuisine, suggest 5 distinct, excellent, detailed recipes. For each recipe, include a short, enticing description.
 
   Ingredients: {{{ingredients}}}
   Cuisine: {{{cuisine}}}

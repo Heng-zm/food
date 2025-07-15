@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Heart } from "lucide-react";
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/drawer";
 import RecipeCard from "@/components/recipe-card";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface FavoritesListProps {
   favorites: Recipe[];
@@ -66,15 +68,18 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
   );
 
   const renderFavoriteItem = (recipe: Recipe) => (
-    <div 
-      className="group cursor-pointer overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-transform duration-200 hover:-translate-y-1"
+    <Card 
+      className="group cursor-pointer overflow-hidden transition-transform duration-200 hover:-translate-y-1"
       onClick={() => handleSelectRecipe(recipe)}
     >
-      <div className="p-4">
-        <h3 className="font-headline text-lg font-semibold truncate">{recipe.recipeName}</h3>
-        <p className="text-sm text-muted-foreground truncate">{recipe.estimatedCookingTime}</p>
-      </div>
-    </div>
+      <CardHeader>
+          <CardTitle className="truncate group-hover:text-accent">{recipe.recipeName}</CardTitle>
+          <CardDescription>{recipe.estimatedCookingTime}</CardDescription>
+      </CardHeader>
+      <CardContent>
+          <p className="text-muted-foreground text-sm line-clamp-3">{recipe.description}</p>
+      </CardContent>
+    </Card>
   );
 
   if (isDesktop) {

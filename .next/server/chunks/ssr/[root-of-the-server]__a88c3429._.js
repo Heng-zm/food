@@ -258,6 +258,7 @@ const SuggestRecipesInputSchema = __TURBOPACK__imported__module__$5b$project$5d2
 // Schema for a single recipe
 const RecipeSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
     recipeName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
+    description: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ការពិពណ៌នាសង្ខេប និងទាក់ទាញអំពីម្ហូប (១-២ ប្រយោគ)។'),
     ingredients: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។ បំបែកធាតុនីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
     instructions: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។ បំបែកជំហាននីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
     estimatedCookingTime: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។')
@@ -282,7 +283,7 @@ const recipePrompt = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2
 
   Please provide the entire response in Khmer (Cambodia).
 
-  Based on the provided ingredients and cuisine, suggest 5 distinct, excellent, detailed recipes.
+  Based on the provided ingredients and cuisine, suggest 5 distinct, excellent, detailed recipes. For each recipe, include a short, enticing description.
 
   Ingredients: {{{ingredients}}}
   Cuisine: {{{cuisine}}}
