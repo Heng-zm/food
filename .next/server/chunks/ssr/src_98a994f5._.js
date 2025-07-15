@@ -911,7 +911,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
     const [isImageLoading, setIsImageLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
     const [imageError, setImageError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        setIsImageLoading(true);
+        setIsImageLoading(!!recipe.imageUrl);
         setImageError(false);
     }, [
         recipe.imageUrl
@@ -2055,7 +2055,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                                                             placeholder: "ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស",
                                                                             ...field,
                                                                             rows: 4,
-                                                                            className: "bg-muted"
+                                                                            className: "bg-input"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/recipe-suggestion.tsx",
                                                                             lineNumber: 291,
@@ -2134,7 +2134,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite })=>{
                                                                     children: [
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormControl"], {
                                                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectTrigger"], {
-                                                                                className: "bg-muted",
+                                                                                className: "bg-input",
                                                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectValue"], {
                                                                                     placeholder: "ជ្រើសរើសប្រភេទម្ហូប"
                                                                                 }, void 0, false, {
@@ -2534,7 +2534,9 @@ const FavoritesList = ({ favorites, onToggleFavorite })=>{
                             src: recipe.imageUrl || "https://placehold.co/600x400.png",
                             alt: recipe.recipeName,
                             fill: true,
-                            objectFit: "cover",
+                            style: {
+                                objectFit: "cover"
+                            },
                             "data-ai-hint": "gourmet food",
                             className: "transition-transform duration-300 group-hover:scale-105"
                         }, void 0, false, {

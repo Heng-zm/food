@@ -31,7 +31,7 @@ const RecipeSchema = z.object({
   ingredients: z.string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។ បំបែកធាតុនីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
   instructions: z.string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។ បំបែកជំហាននីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
   estimatedCookingTime: z.string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
-  imageUrl: z.string().optional().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
+  imageUrl: z.string().nullable().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
 });
 export type Recipe = z.infer<typeof RecipeSchema>;
 
@@ -88,7 +88,7 @@ const GetRecipeDetailsInputSchema = z.object({
 export type GetRecipeDetailsInput = z.infer<typeof GetRecipeDetailsInputSchema>;
 
 const GetRecipeDetailsOutputSchema = z.object({
-  imageUrl: z.string().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
+  imageUrl: z.string().nullable().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
 });
 export type GetRecipeDetailsOutput = z.infer<typeof GetRecipeDetailsOutputSchema>;
 
@@ -121,8 +121,8 @@ const getRecipeDetailsFlow = ai.defineFlow(
       };
     } catch (error) {
        console.error(`Failed to generate image for ${recipeName}:`, error);
-       // Return a placeholder on failure to avoid breaking the whole list
-       return { imageUrl: "https://placehold.co/600x400.png" };
+       // Return null on failure to avoid breaking the whole list
+       return { imageUrl: null };
     }
   }
 );

@@ -262,7 +262,7 @@ const RecipeSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_module
     ingredients: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។ បំបែកធាតុនីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
     instructions: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។ បំបែកជំហាននីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
     estimatedCookingTime: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
-    imageUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().optional().describe('URL នៃរូបភាពនៃរូបមន្ត។')
+    imageUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().nullable().describe('URL នៃរូបភាពនៃរូបមន្ត។')
 });
 const SuggestRecipesOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
     recipes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].array(RecipeSchema.omit({
@@ -309,7 +309,7 @@ const GetRecipeDetailsInputSchema = __TURBOPACK__imported__module__$5b$project$5
     recipeName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string()
 });
 const GetRecipeDetailsOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
-    imageUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('URL នៃរូបភាពនៃរូបមន្ត។')
+    imageUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().nullable().describe('URL នៃរូបភាពនៃរូបមន្ត។')
 });
 async function getRecipeDetails(input) {
     return getRecipeDetailsFlow(input);
@@ -338,9 +338,9 @@ const getRecipeDetailsFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src
         };
     } catch (error) {
         console.error(`Failed to generate image for ${recipeName}:`, error);
-        // Return a placeholder on failure to avoid breaking the whole list
+        // Return null on failure to avoid breaking the whole list
         return {
-            imageUrl: "https://placehold.co/600x400.png"
+            imageUrl: null
         };
     }
 });

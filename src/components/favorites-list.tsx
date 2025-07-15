@@ -76,7 +76,7 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
           src={recipe.imageUrl || "https://placehold.co/600x400.png"}
           alt={recipe.recipeName}
           fill
-          objectFit="cover"
+          style={{objectFit: "cover"}}
           data-ai-hint="gourmet food"
           className="transition-transform duration-300 group-hover:scale-105"
         />

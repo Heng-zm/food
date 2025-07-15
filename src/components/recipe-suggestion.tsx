@@ -292,7 +292,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                             placeholder="ឧ., សាច់មាន់, ប៉េងប៉ោះ, ខ្ទឹមបារាំង, ខ្ទឹមស"
                             {...field}
                             rows={4}
-                            className="bg-muted"
+                            className="bg-input"
                           />
                         </FormControl>
                          <Button
@@ -324,7 +324,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                         <FormLabel>ប្រភេទម្ហូប</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-muted">
+                            <SelectTrigger className="bg-input">
                               <SelectValue placeholder="ជ្រើសរើសប្រភេទម្ហូប" />
                             </SelectTrigger>
                           </FormControl>

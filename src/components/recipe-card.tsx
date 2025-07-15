@@ -33,7 +33,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   const [imageError, setImageError] = useState(false);
   
   useEffect(() => {
-    setIsImageLoading(true);
+    setIsImageLoading(!!recipe.imageUrl);
     setImageError(false);
   }, [recipe.imageUrl]);
 

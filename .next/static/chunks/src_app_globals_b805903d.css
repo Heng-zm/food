@@ -1269,6 +1269,10 @@ body {
   background-color: #0000;
 }
 
+.bg-input {
+  background-color: hsl(var(--input));
+}
+
 .bg-gradient-to-t {
   background-image: linear-gradient(to top, var(--tw-gradient-stops));
 }
