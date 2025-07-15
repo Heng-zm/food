@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Play, Pause, Trash2, ImageOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
@@ -29,15 +29,14 @@ interface RecipeCardProps {
   onToggleFavorite: (recipe: Recipe) => void;
   showRemoveConfirm?: boolean;
   onAudioUpdate?: (audioUrl: string) => void;
-  isFetchingDetails?: boolean;
 }
 
-const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false, onAudioUpdate, isFetchingDetails = false }: RecipeCardProps) => {
+const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false, onAudioUpdate }: RecipeCardProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [isFetchingAudio, setIsFetchingAudio] = useState(false);
   const { toast } = useToast();
-  const [isImageLoading, setIsImageLoading] = useState(!!recipe.imageUrl);
+  const [isImageLoading, setIsImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
@@ -58,8 +57,9 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   }, [recipe.audioUrl]);
   
   useEffect(() => {
-    setIsImageLoading(!!recipe.imageUrl && !imageError);
-  }, [recipe.imageUrl, imageError]);
+    setIsImageLoading(true);
+    setImageError(false);
+  }, [recipe.imageUrl]);
 
 
   const handlePrint = () => {
@@ -157,14 +157,6 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   );
 
   const renderImageContent = () => {
-    if (isFetchingDetails) {
-        return (
-            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-                <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
-                <p>កំពុង​ទាញ​យក​រូបភាព...</p>
-            </div>
-        );
-    }
     if (imageError) {
         return (
             <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
@@ -186,6 +178,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                     src={recipe.imageUrl}
                     alt={recipe.recipeName}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     objectFit="cover"
                     data-ai-hint="gourmet food"
                     className="bg-muted transition-opacity duration-300"

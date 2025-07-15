@@ -927,12 +927,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$b
 ;
 ;
 ;
-const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false, onAudioUpdate, isFetchingDetails = false })=>{
+const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false, onAudioUpdate })=>{
     const [isPlaying, setIsPlaying] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [audio, setAudio] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isFetchingAudio, setIsFetchingAudio] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const { toast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useToast"])();
-    const [isImageLoading, setIsImageLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(!!recipe.imageUrl);
+    const [isImageLoading, setIsImageLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
     const [imageError, setImageError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         let audioInstance = null;
@@ -952,10 +952,10 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
         recipe.audioUrl
     ]);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        setIsImageLoading(!!recipe.imageUrl && !imageError);
+        setIsImageLoading(true);
+        setImageError(false);
     }, [
-        recipe.imageUrl,
-        imageError
+        recipe.imageUrl
     ]);
     const handlePrint = ()=>{
         window.print();
@@ -1113,19 +1113,19 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
             columnNumber: 6
         }, this);
     const renderImageContent = ()=>{
-        if (isFetchingDetails) {
+        if (imageError) {
             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground",
                 children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
-                        className: "h-8 w-8 mb-2 animate-spin text-primary"
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$image$2d$off$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ImageOff$3e$__["ImageOff"], {
+                        className: "h-8 w-8 mb-2 text-destructive"
                     }, void 0, false, {
                         fileName: "[project]/src/components/recipe-card.tsx",
                         lineNumber: 163,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        children: "កំពុង​ទាញ​យក​រូបភាព..."
+                        children: "មិនអាចផ្ទុករូបភាពបានទេ។"
                     }, void 0, false, {
                         fileName: "[project]/src/components/recipe-card.tsx",
                         lineNumber: 164,
@@ -1135,31 +1135,6 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
             }, void 0, true, {
                 fileName: "[project]/src/components/recipe-card.tsx",
                 lineNumber: 162,
-                columnNumber: 13
-            }, this);
-        }
-        if (imageError) {
-            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$image$2d$off$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ImageOff$3e$__["ImageOff"], {
-                        className: "h-8 w-8 mb-2 text-destructive"
-                    }, void 0, false, {
-                        fileName: "[project]/src/components/recipe-card.tsx",
-                        lineNumber: 171,
-                        columnNumber: 17
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        children: "មិនអាចផ្ទុករូបភាពបានទេ។"
-                    }, void 0, false, {
-                        fileName: "[project]/src/components/recipe-card.tsx",
-                        lineNumber: 172,
-                        columnNumber: 17
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/src/components/recipe-card.tsx",
-                lineNumber: 170,
                 columnNumber: 13
             }, this);
         }
@@ -1173,26 +1148,27 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                 className: "h-8 w-8 mb-2 animate-spin text-primary"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                lineNumber: 181,
+                                lineNumber: 173,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 children: "កំពុង​ផ្ទុក​រូបភាព..."
                             }, void 0, false, {
                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                lineNumber: 182,
+                                lineNumber: 174,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/recipe-card.tsx",
-                        lineNumber: 180,
+                        lineNumber: 172,
                         columnNumber: 21
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                         src: recipe.imageUrl,
                         alt: recipe.recipeName,
                         fill: true,
+                        sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
                         objectFit: "cover",
                         "data-ai-hint": "gourmet food",
                         className: "bg-muted transition-opacity duration-300",
@@ -1203,7 +1179,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                         }
                     }, void 0, false, {
                         fileName: "[project]/src/components/recipe-card.tsx",
-                        lineNumber: 185,
+                        lineNumber: 177,
                         columnNumber: 17
                     }, this)
                 ]
@@ -1216,20 +1192,20 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                     className: "h-8 w-8 mb-2"
                 }, void 0, false, {
                     fileName: "[project]/src/components/recipe-card.tsx",
-                    lineNumber: 203,
+                    lineNumber: 196,
                     columnNumber: 13
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                     children: "មិនមានរូបភាពទេ។"
                 }, void 0, false, {
                     fileName: "[project]/src/components/recipe-card.tsx",
-                    lineNumber: 204,
+                    lineNumber: 197,
                     columnNumber: 13
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/recipe-card.tsx",
-            lineNumber: 202,
+            lineNumber: 195,
             columnNumber: 9
         }, this);
     };
@@ -1246,7 +1222,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                             className: "absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
                         }, void 0, false, {
                             fileName: "[project]/src/components/recipe-card.tsx",
-                            lineNumber: 215,
+                            lineNumber: 208,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1256,12 +1232,12 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                 children: recipe.recipeName
                             }, void 0, false, {
                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                lineNumber: 217,
+                                lineNumber: 210,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/recipe-card.tsx",
-                            lineNumber: 216,
+                            lineNumber: 209,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1269,11 +1245,11 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                             children: [
                                 isFavorite && showRemoveConfirm ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RemoveFavoriteButton, {}, void 0, false, {
                                     fileName: "[project]/src/components/recipe-card.tsx",
-                                    lineNumber: 222,
+                                    lineNumber: 215,
                                     columnNumber: 48
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(FavoriteButton, {}, void 0, false, {
                                     fileName: "[project]/src/components/recipe-card.tsx",
-                                    lineNumber: 222,
+                                    lineNumber: 215,
                                     columnNumber: 75
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1285,29 +1261,29 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                         className: "h-5 w-5 text-primary"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                        lineNumber: 229,
+                                        lineNumber: 222,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/recipe-card.tsx",
-                                    lineNumber: 223,
+                                    lineNumber: 216,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/recipe-card.tsx",
-                            lineNumber: 221,
+                            lineNumber: 214,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/recipe-card.tsx",
-                    lineNumber: 213,
+                    lineNumber: 206,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/recipe-card.tsx",
-                lineNumber: 212,
+                lineNumber: 205,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1324,14 +1300,14 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                         className: "mr-2 h-4 w-4 text-primary"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                        lineNumber: 237,
+                                        lineNumber: 230,
                                         columnNumber: 13
                                     }, this),
                                     recipe.estimatedCookingTime
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                lineNumber: 236,
+                                lineNumber: 229,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -1342,27 +1318,27 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                         className: "mr-2 h-4 w-4 text-primary"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                        lineNumber: 241,
+                                        lineNumber: 234,
                                         columnNumber: 13
                                     }, this),
                                     recipe.nutritionalInformation
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                lineNumber: 240,
+                                lineNumber: 233,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/recipe-card.tsx",
-                        lineNumber: 235,
+                        lineNumber: 228,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$separator$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Separator"], {
                         className: "my-6"
                     }, void 0, false, {
                         fileName: "[project]/src/components/recipe-card.tsx",
-                        lineNumber: 246,
+                        lineNumber: 239,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1377,14 +1353,14 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                                 className: "h-6 w-6 text-primary"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                                lineNumber: 251,
+                                                lineNumber: 244,
                                                 columnNumber: 15
                                             }, this),
                                             "គ្រឿងផ្សំ"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                        lineNumber: 250,
+                                        lineNumber: 243,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -1396,31 +1372,31 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                                         className: "mr-2 mt-1 block h-1.5 w-1.5 rounded-full bg-primary"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                                        lineNumber: 257,
+                                                        lineNumber: 250,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: ingredient
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                                        lineNumber: 258,
+                                                        lineNumber: 251,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, index, true, {
                                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                                lineNumber: 256,
+                                                lineNumber: 249,
                                                 columnNumber: 17
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                        lineNumber: 254,
+                                        lineNumber: 247,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                lineNumber: 249,
+                                lineNumber: 242,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1435,14 +1411,14 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                                         className: "h-6 w-6 text-primary"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                                        lineNumber: 266,
+                                                        lineNumber: 259,
                                                         columnNumber: 17
                                                     }, this),
                                                     "ការណែនាំ"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                                lineNumber: 265,
+                                                lineNumber: 258,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1456,30 +1432,30 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                                     className: "h-5 w-5 animate-spin text-primary"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-card.tsx",
-                                                    lineNumber: 278,
+                                                    lineNumber: 271,
                                                     columnNumber: 19
                                                 }, this) : isPlaying ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pause$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Pause$3e$__["Pause"], {
                                                     className: "h-5 w-5 text-primary"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-card.tsx",
-                                                    lineNumber: 280,
+                                                    lineNumber: 273,
                                                     columnNumber: 19
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$play$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Play$3e$__["Play"], {
                                                     className: "h-5 w-5 text-primary"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/recipe-card.tsx",
-                                                    lineNumber: 282,
+                                                    lineNumber: 275,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                                lineNumber: 269,
+                                                lineNumber: 262,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                        lineNumber: 264,
+                                        lineNumber: 257,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ol", {
@@ -1492,49 +1468,49 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                                                         children: index + 1
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                                        lineNumber: 289,
+                                                        lineNumber: 282,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: instruction
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                                        lineNumber: 292,
+                                                        lineNumber: 285,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, index, true, {
                                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                                lineNumber: 288,
+                                                lineNumber: 281,
                                                 columnNumber: 17
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/recipe-card.tsx",
-                                        lineNumber: 286,
+                                        lineNumber: 279,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/recipe-card.tsx",
-                                lineNumber: 263,
+                                lineNumber: 256,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/recipe-card.tsx",
-                        lineNumber: 248,
+                        lineNumber: 241,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/recipe-card.tsx",
-                lineNumber: 234,
+                lineNumber: 227,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/recipe-card.tsx",
-        lineNumber: 211,
+        lineNumber: 204,
         columnNumber: 5
     }, this);
 };
