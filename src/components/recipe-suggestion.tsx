@@ -8,6 +8,7 @@ import { z } from "zod";
 import { Loader2, Mic, MicOff, Sparkles, RefreshCw, ImageOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+
 
 const formSchema = z.object({
   ingredients: z.string().min(3, {
@@ -84,6 +92,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   const { toast } = useToast();
   const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
   const [recommendedDishes, setRecommendedDishes] = useState<string[]>([]);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -242,17 +251,12 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   
   const renderRecipeThumbnail = (recipe: Recipe) => {
     const hasImage = !!recipe.imageUrl && !recipe.imageUrl.includes('placehold.co');
-    const isImageLoading = !hasImage && isLoading;
-
+  
     return (
       <div className="relative h-40 w-full">
-        {isImageLoading ? (
-            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        ) : hasImage ? (
+        {recipe.imageUrl ? (
              <Image
-                src={recipe.imageUrl!}
+                src={recipe.imageUrl}
                 alt={recipe.recipeName}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -262,13 +266,26 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
             />
         ) : (
             <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-                <ImageOff className="h-8 w-8" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         )}
          <div className="absolute inset-0 bg-black/30" />
       </div>
     );
   }
+
+  const RecipeDetailView = ({ recipe }: { recipe: Recipe }) => {
+    return (
+      <div className="max-h-[85vh] overflow-y-auto">
+        <RecipeCard
+          recipe={recipe}
+          isFavorite={favorites.some(fav => fav.recipeName === recipe.recipeName)}
+          onToggleFavorite={onToggleFavorite}
+          onAudioUpdate={handleAudioUpdate}
+        />
+      </div>
+    );
+  };
 
   return (
     <div className="mt-6">
@@ -413,19 +430,25 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
         )}
         
         {selectedRecipe && (
-           <Dialog open={!!selectedRecipe} onOpenChange={(open) => !open && setSelectedRecipe(null)}>
-            <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
-              <DialogHeader className="p-6 pb-0 flex flex-row items-center justify-between">
-                <DialogTitle>{selectedRecipe.recipeName}</DialogTitle>
-              </DialogHeader>
-              <RecipeCard
-                recipe={selectedRecipe}
-                isFavorite={favorites.some(fav => fav.recipeName === selectedRecipe.recipeName)}
-                onToggleFavorite={onToggleFavorite}
-                onAudioUpdate={handleAudioUpdate}
-              />
-            </DialogContent>
-          </Dialog>
+          isDesktop ? (
+            <Dialog open={!!selectedRecipe} onOpenChange={(open) => !open && setSelectedRecipe(null)}>
+              <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
+                <DialogHeader className="p-6 pb-0">
+                  <DialogTitle>{selectedRecipe.recipeName}</DialogTitle>
+                </DialogHeader>
+                <RecipeDetailView recipe={selectedRecipe} />
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <Drawer open={!!selectedRecipe} onOpenChange={(open) => !open && setSelectedRecipe(null)}>
+              <DrawerContent>
+                <DrawerHeader className="text-left">
+                  <DrawerTitle>{selectedRecipe.recipeName}</DrawerTitle>
+                </DrawerHeader>
+                <RecipeDetailView recipe={selectedRecipe} />
+              </DrawerContent>
+            </Drawer>
+          )
         )}
 
       </div>

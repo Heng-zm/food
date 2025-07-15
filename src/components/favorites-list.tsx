@@ -2,6 +2,8 @@
 
 import { Heart } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 import {
   Dialog,
@@ -10,6 +12,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import RecipeCard from "@/components/recipe-card";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
 
@@ -19,6 +28,19 @@ interface FavoritesListProps {
 }
 
 const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  const handleSelectRecipe = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+  };
+  
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setSelectedRecipe(null);
+    }
+  }
+
   if (favorites.length === 0) {
     return (
       <div className="mt-8 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted p-12 text-center">
@@ -33,42 +55,75 @@ const FavoritesList = ({ favorites, onToggleFavorite }: FavoritesListProps) => {
     );
   }
 
+  const RecipeDetailView = ({ recipe }: { recipe: Recipe }) => (
+    <div className="max-h-[85vh] overflow-y-auto">
+      <RecipeCard 
+        recipe={recipe}
+        isFavorite={true}
+        onToggleFavorite={onToggleFavorite}
+        showRemoveConfirm={true}
+      />
+    </div>
+  );
+
+  const renderFavoriteItem = (recipe: Recipe) => (
+    <div 
+      className="group cursor-pointer overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-transform duration-200 hover:-translate-y-1"
+      onClick={() => handleSelectRecipe(recipe)}
+    >
+      <div className="relative h-40 w-full">
+        <Image
+          src={recipe.imageUrl || "https://placehold.co/600x400.png"}
+          alt={recipe.recipeName}
+          fill
+          objectFit="cover"
+          data-ai-hint="gourmet food"
+          className="transition-transform duration-300 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
+      <div className="p-4">
+        <h3 className="font-headline text-lg font-semibold truncate">{recipe.recipeName}</h3>
+        <p className="text-sm text-muted-foreground truncate">{recipe.estimatedCookingTime}</p>
+      </div>
+    </div>
+  );
+
+  if (isDesktop) {
+    return (
+      <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {favorites.map((recipe) => (
+          <Dialog key={recipe.recipeName} open={selectedRecipe?.recipeName === recipe.recipeName} onOpenChange={handleOpenChange}>
+            <DialogTrigger asChild>
+              {renderFavoriteItem(recipe)}
+            </DialogTrigger>
+            <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
+               <DialogHeader className="p-6 pb-0">
+                  <DialogTitle>{recipe.recipeName}</DialogTitle>
+               </DialogHeader>
+               <RecipeDetailView recipe={recipe} />
+            </DialogContent>
+          </Dialog>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {favorites.map((recipe) => (
-        <Dialog key={recipe.recipeName}>
-          <DialogTrigger asChild>
-            <div className="group cursor-pointer overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-transform duration-200 hover:-translate-y-1">
-              <div className="relative h-40 w-full">
-                <Image
-                  src={recipe.imageUrl || "https://placehold.co/600x400.png"}
-                  alt={recipe.recipeName}
-                  fill
-                  objectFit="cover"
-                  data-ai-hint="gourmet food"
-                  className="transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/30" />
-              </div>
-              <div className="p-4">
-                <h3 className="font-headline text-lg font-semibold truncate">{recipe.recipeName}</h3>
-                <p className="text-sm text-muted-foreground truncate">{recipe.estimatedCookingTime}</p>
-              </div>
-            </div>
-          </DialogTrigger>
-          <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
-             <DialogHeader className="p-6 pb-0">
-                <DialogTitle>{recipe.recipeName}</DialogTitle>
-             </DialogHeader>
-             <RecipeCard 
-                recipe={recipe}
-                isFavorite={true}
-                onToggleFavorite={onToggleFavorite}
-                showRemoveConfirm={true}
-             />
-          </DialogContent>
-        </Dialog>
-      ))}
+       {favorites.map((recipe) => (
+          <Drawer key={recipe.recipeName} open={selectedRecipe?.recipeName === recipe.recipeName} onOpenChange={handleOpenChange}>
+            <DrawerTrigger asChild>
+               {renderFavoriteItem(recipe)}
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader className="text-left">
+                <DrawerTitle>{recipe.recipeName}</DrawerTitle>
+              </DrawerHeader>
+              <RecipeDetailView recipe={recipe} />
+            </DrawerContent>
+          </Drawer>
+        ))}
     </div>
   );
 };

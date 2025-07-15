@@ -560,6 +560,10 @@ body {
   margin-top: .5rem;
 }
 
+.mt-24 {
+  margin-top: 6rem;
+}
+
 .mt-4 {
   margin-top: 1rem;
 }
@@ -570,6 +574,10 @@ body {
 
 .mt-8 {
   margin-top: 2rem;
+}
+
+.mt-auto {
+  margin-top: auto;
 }
 
 .block {
@@ -681,6 +689,10 @@ body {
   height: var(--radix-select-trigger-height);
 }
 
+.h-auto {
+  height: auto;
+}
+
 .h-full {
   height: 100%;
 }
@@ -695,6 +707,10 @@ body {
 
 .max-h-96 {
   max-height: 24rem;
+}
+
+.max-h-\[85vh\] {
+  max-height: 85vh;
 }
 
 .max-h-\[90svh\] {
@@ -727,6 +743,10 @@ body {
 
 .w-1\.5 {
   width: .375rem;
+}
+
+.w-1\/2 {
+  width: 50%;
 }
 
 .w-10 {
@@ -789,6 +809,10 @@ body {
   width: var(--sidebar-width);
 }
 
+.w-\[100px\] {
+  width: 100px;
+}
+
 .w-\[1px\] {
   width: 1px;
 }
@@ -799,10 +823,6 @@ body {
 
 .w-full {
   width: 100%;
-}
-
-.w-1\/2 {
-  width: 50%;
 }
 
 .min-w-0 {
@@ -946,10 +966,6 @@ body {
 
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.flex-row {
-  flex-direction: row;
 }
 
 .flex-col {
@@ -1104,6 +1120,11 @@ body {
   border-radius: calc(var(--radius)  - 4px);
 }
 
+.rounded-t-\[10px\] {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
 .border {
   border-width: 1px;
 }
@@ -1220,6 +1241,10 @@ body {
   background-color: hsl(var(--muted) / .5);
 }
 
+.bg-muted\/80 {
+  background-color: hsl(var(--muted) / .8);
+}
+
 .bg-popover {
   background-color: hsl(var(--popover));
 }
@@ -1242,10 +1267,6 @@ body {
 
 .bg-transparent {
   background-color: #0000;
-}
-
-.bg-muted\/80 {
-  background-color: hsl(var(--muted) / .8);
 }
 
 .bg-gradient-to-t {
@@ -1885,10 +1906,6 @@ body {
   background-color: hsl(var(--destructive) / .9);
 }
 
-.hover\:bg-muted:hover {
-  background-color: hsl(var(--muted));
-}
-
 .hover\:bg-muted\/50:hover {
   background-color: hsl(var(--muted) / .5);
 }
@@ -2345,7 +2362,7 @@ body {
   --tw-enter-translate-y: .5rem;
 }
 
-.data-\[state\=closed\]\:slide-out-to-bottom[data-state="closed"] {
+.data-\[state\=closed\]\:slide-out-to-bottom[data-state="closed"], .data-\[state\=closed\]\:slide-out-to-bottom-\[100\%\][data-state="closed"] {
   --tw-exit-translate-y: 100%;
 }
 
@@ -2369,7 +2386,7 @@ body {
   --tw-exit-translate-y: -48%;
 }
 
-.data-\[state\=open\]\:slide-in-from-bottom[data-state="open"] {
+.data-\[state\=open\]\:slide-in-from-bottom[data-state="open"], .data-\[state\=open\]\:slide-in-from-bottom-\[100\%\][data-state="open"] {
   --tw-enter-translate-y: 100%;
 }
 
@@ -2395,14 +2412,6 @@ body {
 
 .data-\[state\=open\]\:slide-in-from-top-full[data-state="open"] {
   --tw-enter-translate-y: -100%;
-}
-
-.data-\[state\=closed\]\:slide-out-to-bottom-\[100\%\][data-state="closed"] {
-  --tw-exit-translate-y: 100%;
-}
-
-.data-\[state\=open\]\:slide-in-from-bottom-\[100\%\][data-state="open"] {
-  --tw-enter-translate-y: 100%;
 }
 
 .data-\[state\=closed\]\:duration-300[data-state="closed"] {
@@ -2556,14 +2565,6 @@ body {
     bottom: 0;
   }
 
-  .sm\:right-0 {
-    right: 0;
-  }
-
-  .sm\:top-auto {
-    top: auto;
-  }
-
   .sm\:bottom-auto {
     bottom: auto;
   }
@@ -2572,8 +2573,16 @@ body {
     left: 50%;
   }
 
+  .sm\:right-0 {
+    right: 0;
+  }
+
   .sm\:top-\[50\%\] {
     top: 50%;
+  }
+
+  .sm\:top-auto {
+    top: auto;
   }
 
   .sm\:mt-0 {
@@ -2592,12 +2601,12 @@ body {
     max-width: 48rem;
   }
 
-  .sm\:max-w-sm {
-    max-width: 24rem;
-  }
-
   .sm\:max-w-lg {
     max-width: 32rem;
+  }
+
+  .sm\:max-w-sm {
+    max-width: 24rem;
   }
 
   .sm\:translate-x-\[-50\%\] {
@@ -2676,16 +2685,16 @@ body {
     --tw-enter-scale: .95;
   }
 
-  .data-\[state\=open\]\:sm\:slide-in-from-bottom-full[data-state="open"] {
-    --tw-enter-translate-y: 100%;
-  }
-
   .data-\[state\=closed\]\:sm\:slide-out-to-left-1\/2[data-state="closed"] {
     --tw-exit-translate-x: -50%;
   }
 
   .data-\[state\=closed\]\:sm\:slide-out-to-top-\[48\%\][data-state="closed"] {
     --tw-exit-translate-y: -48%;
+  }
+
+  .data-\[state\=open\]\:sm\:slide-in-from-bottom-full[data-state="open"] {
+    --tw-enter-translate-y: 100%;
   }
 
   .data-\[state\=open\]\:sm\:slide-in-from-left-1\/2[data-state="open"] {
@@ -2726,6 +2735,11 @@ body {
     padding: 2rem;
   }
 
+  .md\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+
   .md\:text-5xl {
     font-size: 3rem;
     line-height: 1;
@@ -2734,11 +2748,6 @@ body {
   .md\:text-sm {
     font-size: .875rem;
     line-height: 1.25rem;
-  }
-
-  .md\:text-3xl {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
   }
 
   .md\:opacity-0 {
