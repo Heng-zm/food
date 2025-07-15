@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
+import { getAudioForRecipeAction } from "@/app/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,11 +27,13 @@ interface RecipeCardProps {
   isFavorite: boolean;
   onToggleFavorite: (recipe: Recipe) => void;
   showRemoveConfirm?: boolean;
+  onAudioUpdate?: (audioUrl: string) => void;
 }
 
-const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false }: RecipeCardProps) => {
+const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false, onAudioUpdate }: RecipeCardProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [isFetchingAudio, setIsFetchingAudio] = useState(false);
   const { toast } = useToast();
   const [isImageLoading, setIsImageLoading] = useState(true);
 
@@ -45,6 +48,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
     return () => {
       if (audioInstance) {
         audioInstance.pause();
+        audioInstance.onended = null;
       }
       setAudio(null);
     };
@@ -60,28 +64,45 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   }
   
   const handleReadAloud = async () => {
-    if (!audio) {
-      toast({
-        variant: "destructive",
-        title: "មិនអាចចាក់សំឡេងបានទេ",
-        description: "ឯកសារអូឌីយ៉ូមិនមានសម្រាប់រូបមន្តនេះទេ។",
-      });
+    if (audio) {
+      if (isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
+      } else {
+        audio.play().catch(e => {
+          console.error("Error playing audio:", e);
+          toast({
+            variant: "destructive",
+            title: "បញ្ហាក្នុងការចាក់សំឡេង",
+            description: "មិនអាចចាក់ឯកសារអូឌីយ៉ូបានទេ។ សូមព្យាយាមម្តងទៀត។",
+          });
+        });
+        setIsPlaying(true);
+      }
       return;
     }
 
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-    } else {
-      audio.play().catch(e => {
-        console.error("Error playing audio:", e);
-        toast({
-          variant: "destructive",
-          title: "បញ្ហាក្នុងការចាក់សំឡេង",
-          description: "មិនអាចចាក់ឯកសារអូឌីយ៉ូបានទេ។ សូមព្យាយាមម្តងទៀត។",
-        });
-      });
+    if (isFetchingAudio) return;
+
+    setIsFetchingAudio(true);
+    const result = await getAudioForRecipeAction({ instructions: recipe.instructions });
+    setIsFetchingAudio(false);
+
+    if (result.success && result.data?.audioUrl) {
+      if(onAudioUpdate) {
+          onAudioUpdate(result.data.audioUrl);
+      }
+      const newAudio = new Audio(result.data.audioUrl);
+      newAudio.onended = () => setIsPlaying(false);
+      setAudio(newAudio);
+      newAudio.play().catch(e => console.error("Error playing new audio:", e));
       setIsPlaying(true);
+    } else {
+      toast({
+        variant: "destructive",
+        title: "មិនអាចបង្កើតសំឡេងបានទេ",
+        description: result.error || "មានបញ្ហាក្នុងការបង្កើតឯកសារអូឌីយ៉ូ។",
+      });
     }
   };
 
@@ -147,13 +168,16 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                 data-ai-hint="gourmet food"
                 className="bg-muted"
                 onLoad={() => setIsImageLoading(false)}
-                onError={() => setIsImageLoading(false)} // Handle error case as well
+                onError={() => {
+                  setIsImageLoading(false);
+                  // Optionally handle image loading error, e.g., set a placeholder
+                }}
               />
             </>
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-              <ImageOff className="h-8 w-8 mb-2 text-primary" />
-              <p>មិនមានរូបភាព</p>
+              <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
+              <p>កំពុងបង្កើតរូបភាព ......</p>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -218,11 +242,13 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                 variant="ghost"
                 size="icon"
                 onClick={handleReadAloud}
-                disabled={!recipe.audioUrl}
+                disabled={isFetchingAudio}
                 aria-label="អានការណែនាំឮៗ"
                 className="no-print"
               >
-                {isPlaying ? (
+                {isFetchingAudio ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                ) : isPlaying ? (
                   <Pause className="h-5 w-5 text-primary" />
                 ) : (
                   <Play className="h-5 w-5 text-primary" />

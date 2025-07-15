@@ -7,11 +7,14 @@
  *
  * - suggestRecipe - A function that suggests recipes based on available ingredients and desired cuisine.
  * - getRecipeDetails - A function that gets the image and audio for a specific recipe.
+ * - suggestRecipeAndDetails - A function that suggests a single recipe and fetches its details.
  * - SuggestRecipeInput - The input type for the suggestRecipe function.
  * - Recipe - A single recipe object.
  * - SuggestRecipeOutput - The return type for the suggestRecipe function.
  * - GetRecipeDetailsInput - The input type for the getRecipeDetails function.
  * - GetRecipeDetailsOutput - The return type for the getRecipeDetails function.
+ * - GetAudioForRecipeInput - The input type for the getAudioForRecipe function.
+ * - GetAudioForRecipeOutput - The return type for the getAudioForRecipe function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -79,16 +82,14 @@ const suggestRecipeFlow = ai.defineFlow(
 );
 
 
-// Flow to get details (image, audio) for a single recipe
+// Flow to get details (image) for a single recipe
 const GetRecipeDetailsInputSchema = z.object({
   recipeName: z.string(),
-  instructions: z.string(),
 });
 export type GetRecipeDetailsInput = z.infer<typeof GetRecipeDetailsInputSchema>;
 
 const GetRecipeDetailsOutputSchema = z.object({
   imageUrl: z.string().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
-  audioUrl: z.string().describe("URL ទិន្នន័យនៃសំឡេងនៃការណែនាំ។"),
 });
 export type GetRecipeDetailsOutput = z.infer<typeof GetRecipeDetailsOutputSchema>;
 
@@ -103,13 +104,41 @@ const getRecipeDetailsFlow = ai.defineFlow(
     inputSchema: GetRecipeDetailsInputSchema,
     outputSchema: GetRecipeDetailsOutputSchema,
   },
-  async ({ recipeName, instructions }) => {
-    // Generate image URL and audio sequentially to avoid rate limiting.
+  async ({ recipeName }) => {
     const imageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(recipeName)}`;
+    return {
+      imageUrl: imageUrl,
+    };
+  }
+);
+
+
+// Flow to get audio for a single recipe
+const GetAudioForRecipeInputSchema = z.object({
+  instructions: z.string(),
+});
+export type GetAudioForRecipeInput = z.infer<typeof GetAudioForRecipeInputSchema>;
+
+const GetAudioForRecipeOutputSchema = z.object({
+  audioUrl: z.string().describe("URL ទិន្នន័យនៃសំឡេងនៃការណែនាំ។"),
+});
+export type GetAudioForRecipeOutput = z.infer<typeof GetAudioForRecipeOutputSchema>;
+
+
+export async function getAudioForRecipe(input: GetAudioForRecipeInput): Promise<GetAudioForRecipeOutput> {
+  return getAudioForRecipeFlow(input);
+}
+
+const getAudioForRecipeFlow = ai.defineFlow(
+  {
+    name: 'getAudioForRecipeFlow',
+    inputSchema: GetAudioForRecipeInputSchema,
+    outputSchema: GetAudioForRecipeOutputSchema,
+  },
+  async ({ instructions }) => {
     const audioResult = await textToSpeech({text: `ការណែនាំ៖\n${instructions}`});
 
     return {
-      imageUrl: imageUrl,
       audioUrl: audioResult.audioUrl,
     };
   }

@@ -208,7 +208,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   };
 
   const handleRecipeSelect = async (recipe: Recipe) => {
-    if (recipe.imageUrl && recipe.audioUrl) {
+    if (recipe.imageUrl) {
       setSelectedRecipe(recipe);
       return;
     }
@@ -218,7 +218,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 
     const result = await getRecipeDetailsAction({
       recipeName: recipe.recipeName,
-      instructions: recipe.instructions,
     });
     setIsFetchingDetails(false);
 
@@ -226,7 +225,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
       const fullRecipe = {
         ...recipe,
         imageUrl: result.data.imageUrl,
-        audioUrl: result.data.audioUrl,
       };
       setSelectedRecipe(fullRecipe);
       // Update the list as well so we don't have to fetch again
@@ -236,11 +234,21 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     } else {
        toast({
         variant: "destructive",
-        title: "មិនអាចទាញយកព័ត៌មានលម្អិតបានទេ",
-        description: result.error || "មានបញ្ហាក្នុងការទាញយករូបភាព និងសំឡេងសម្រាប់រូបមន្តនេះ។",
+        title: "មិនអាចទាញយករូបភាពបានទេ",
+        description: result.error || "មានបញ្ហាក្នុងការទាញយករូបភាពសម្រាប់រូបមន្តនេះ។",
       });
     }
   };
+
+  const handleAudioUpdate = (audioUrl: string) => {
+    if (selectedRecipe) {
+      const updatedRecipe = { ...selectedRecipe, audioUrl };
+      setSelectedRecipe(updatedRecipe);
+       setSuggestedRecipes(prev => 
+        prev?.map(r => r.recipeName === selectedRecipe.recipeName ? updatedRecipe : r) || null
+      );
+    }
+  }
 
   const LoadingSkeleton = () => (
     <div className="mt-8 space-y-4">
@@ -390,6 +398,7 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                 recipe={selectedRecipe}
                 isFavorite={favorites.some(fav => fav.recipeName === selectedRecipe.recipeName)}
                 onToggleFavorite={onToggleFavorite}
+                onAudioUpdate={handleAudioUpdate}
               />
             </DialogContent>
           </Dialog>

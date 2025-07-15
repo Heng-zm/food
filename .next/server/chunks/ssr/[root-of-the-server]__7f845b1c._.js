@@ -336,7 +336,8 @@ const textToSpeechFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$
 var { g: global, __dirname } = __turbopack_context__;
 {
 // This file holds the Genkit flow for suggesting recipes based on user-provided ingredients and cuisine preferences.
-/* __next_internal_action_entry_do_not_use__ [{"401a779b31d2bfc23f9526a7e90e5478194638e19a":"suggestRecipe","409b838c47570daa6b745fec787e26d4bc20dc56c4":"getRecipeDetails"},"",""] */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ [{"400553dfbc4e431bf4a8947a4a40cd40c49c5433b7":"getAudioForRecipe","401a779b31d2bfc23f9526a7e90e5478194638e19a":"suggestRecipe","409b838c47570daa6b745fec787e26d4bc20dc56c4":"getRecipeDetails"},"",""] */ __turbopack_context__.s({
+    "getAudioForRecipe": (()=>getAudioForRecipe),
     "getRecipeDetails": (()=>getRecipeDetails),
     "suggestRecipe": (()=>suggestRecipe)
 });
@@ -347,11 +348,14 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
  *
  * - suggestRecipe - A function that suggests recipes based on available ingredients and desired cuisine.
  * - getRecipeDetails - A function that gets the image and audio for a specific recipe.
+ * - suggestRecipeAndDetails - A function that suggests a single recipe and fetches its details.
  * - SuggestRecipeInput - The input type for the suggestRecipe function.
  * - Recipe - A single recipe object.
  * - SuggestRecipeOutput - The return type for the suggestRecipe function.
  * - GetRecipeDetailsInput - The input type for the getRecipeDetails function.
  * - GetRecipeDetailsOutput - The return type for the getRecipeDetails function.
+ * - GetAudioForRecipeInput - The input type for the getAudioForRecipe function.
+ * - GetAudioForRecipeOutput - The return type for the getAudioForRecipe function.
  */ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/ai/genkit.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$index$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/genkit/lib/index.mjs [app-rsc] (ecmascript) <module evaluation>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/genkit/lib/common.js [app-rsc] (ecmascript)");
@@ -413,14 +417,12 @@ const suggestRecipeFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f
     const { output } = await recipePrompt(input);
     return output;
 });
-// Flow to get details (image, audio) for a single recipe
+// Flow to get details (image) for a single recipe
 const GetRecipeDetailsInputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
-    recipeName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string(),
-    instructions: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string()
+    recipeName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string()
 });
 const GetRecipeDetailsOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
-    imageUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('URL នៃរូបភាពនៃរូបមន្ត។'),
-    audioUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe("URL ទិន្នន័យនៃសំឡេងនៃការណែនាំ។")
+    imageUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('URL នៃរូបភាពនៃរូបមន្ត។')
 });
 async function getRecipeDetails(input) {
     return getRecipeDetailsFlow(input);
@@ -429,31 +431,51 @@ const getRecipeDetailsFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src
     name: 'getRecipeDetailsFlow',
     inputSchema: GetRecipeDetailsInputSchema,
     outputSchema: GetRecipeDetailsOutputSchema
-}, async ({ recipeName, instructions })=>{
-    // Generate image URL and audio sequentially to avoid rate limiting.
+}, async ({ recipeName })=>{
     const imageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(recipeName)}`;
+    return {
+        imageUrl: imageUrl
+    };
+});
+// Flow to get audio for a single recipe
+const GetAudioForRecipeInputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
+    instructions: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string()
+});
+const GetAudioForRecipeOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
+    audioUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe("URL ទិន្នន័យនៃសំឡេងនៃការណែនាំ។")
+});
+async function getAudioForRecipe(input) {
+    return getAudioForRecipeFlow(input);
+}
+const getAudioForRecipeFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ai"].defineFlow({
+    name: 'getAudioForRecipeFlow',
+    inputSchema: GetAudioForRecipeInputSchema,
+    outputSchema: GetAudioForRecipeOutputSchema
+}, async ({ instructions })=>{
     const audioResult = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$text$2d$to$2d$speech$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["textToSpeech"])({
         text: `ការណែនាំ៖\n${instructions}`
     });
     return {
-        imageUrl: imageUrl,
         audioUrl: audioResult.audioUrl
     };
 });
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     suggestRecipe,
-    getRecipeDetails
+    getRecipeDetails,
+    getAudioForRecipe
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(suggestRecipe, "401a779b31d2bfc23f9526a7e90e5478194638e19a", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRecipeDetails, "409b838c47570daa6b745fec787e26d4bc20dc56c4", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getAudioForRecipe, "400553dfbc4e431bf4a8947a4a40cd40c49c5433b7", null);
 }}),
 "[project]/src/app/actions.ts [app-rsc] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-/* __next_internal_action_entry_do_not_use__ [{"40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6":"getRecipeSuggestion","40ddeef526be29027e9482a3d131d97b6609769f70":"getRecipeDetailsAction"},"",""] */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ [{"4072f449b9b84710caba97820d55fe8ed5df361598":"getAudioForRecipeAction","40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6":"getRecipeSuggestion","40ddeef526be29027e9482a3d131d97b6609769f70":"getRecipeDetailsAction"},"",""] */ __turbopack_context__.s({
+    "getAudioForRecipeAction": (()=>getAudioForRecipeAction),
     "getRecipeDetailsAction": (()=>getRecipeDetailsAction),
     "getRecipeSuggestion": (()=>getRecipeSuggestion)
 });
@@ -500,13 +522,33 @@ async function getRecipeDetailsAction(data) {
         };
     }
 }
+async function getAudioForRecipeAction(data) {
+    try {
+        const details = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$suggest$2d$recipe$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getAudioForRecipe"])(data);
+        return {
+            success: true,
+            data: details,
+            error: null
+        };
+    } catch (error) {
+        console.error(error);
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+        return {
+            success: false,
+            data: null,
+            error: `Failed to get audio. ${errorMessage}`
+        };
+    }
+}
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     getRecipeSuggestion,
-    getRecipeDetailsAction
+    getRecipeDetailsAction,
+    getAudioForRecipeAction
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRecipeSuggestion, "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRecipeDetailsAction, "40ddeef526be29027e9482a3d131d97b6609769f70", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getAudioForRecipeAction, "4072f449b9b84710caba97820d55fe8ed5df361598", null);
 }}),
 "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>": ((__turbopack_context__) => {
 "use strict";
@@ -515,6 +557,7 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({});
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/actions.ts [app-rsc] (ecmascript)");
+;
 ;
 ;
 }}),
@@ -533,6 +576,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server
 var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
+    "4072f449b9b84710caba97820d55fe8ed5df361598": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getAudioForRecipeAction"]),
     "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRecipeSuggestion"]),
     "40ddeef526be29027e9482a3d131d97b6609769f70": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRecipeDetailsAction"])
 });
@@ -545,6 +589,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server
 var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
+    "4072f449b9b84710caba97820d55fe8ed5df361598": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["4072f449b9b84710caba97820d55fe8ed5df361598"]),
     "40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40aa3fc55daf9edee8c8c4e69b8d1ee15da1b642a6"]),
     "40ddeef526be29027e9482a3d131d97b6609769f70": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40ddeef526be29027e9482a3d131d97b6609769f70"])
 });
