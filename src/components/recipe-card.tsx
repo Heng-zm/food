@@ -1,9 +1,7 @@
 
 "use client";
 
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import { Clock, Heart, Printer, UtensilsCrossed, BookOpen, Trash2, ImageOff, Loader2 } from "lucide-react";
+import { Clock, Heart, Printer, UtensilsCrossed, BookOpen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -29,14 +27,6 @@ interface RecipeCardProps {
 }
 
 const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false }: RecipeCardProps) => {
-  const [isImageLoading, setIsImageLoading] = useState(true);
-  const [imageError, setImageError] = useState(false);
-  
-  useEffect(() => {
-    setIsImageLoading(!!recipe.imageUrl);
-    setImageError(false);
-  }, [recipe.imageUrl]);
-
 
   const handlePrint = () => {
     window.print();
@@ -89,75 +79,27 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
     </AlertDialog>
   );
 
-  const renderImageContent = () => {
-    if (imageError) {
-        return (
-            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-                <ImageOff className="h-8 w-8 mb-2 text-destructive" />
-                <p>មិនអាចផ្ទុករូបភាពបានទេ។</p>
-            </div>
-        );
-    }
-    if (recipe.imageUrl) {
-        return (
-            <>
-                {isImageLoading && (
-                    <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-muted/80 text-muted-foreground backdrop-blur-sm">
-                        <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
-                        <p>កំពុង​ផ្ទុក​រូបភាព...</p>
-                    </div>
-                )}
-                <Image
-                    src={recipe.imageUrl}
-                    alt={recipe.recipeName}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    style={{objectFit: "cover"}}
-                    data-ai-hint="gourmet food"
-                    className="bg-muted transition-opacity duration-300"
-                    onLoad={() => setIsImageLoading(false)}
-                    onError={() => {
-                        setIsImageLoading(false);
-                        setImageError(true);
-                    }}
-                />
-            </>
-        );
-    }
-    return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
-            <ImageOff className="h-8 w-8 mb-2" />
-            <p>មិនមានរូបភាពទេ។</p>
-        </div>
-    );
-  };
-
-
   return (
     <div className="w-full overflow-hidden printable-area">
-      <CardHeader className="p-0">
-        <div className="relative h-64 w-full">
-          {renderImageContent()}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          <div className="absolute bottom-0 left-0 p-6">
-            <CardTitle className="font-headline text-3xl font-bold text-white">
+      <CardHeader className="p-6">
+          <div className="flex items-start justify-between">
+            <CardTitle className="font-headline text-3xl font-bold text-primary">
               {recipe.recipeName}
             </CardTitle>
+            <div className="flex gap-2 no-print">
+              {isFavorite && showRemoveConfirm ? <RemoveFavoriteButton /> : <FavoriteButton />}
+              <Button
+                variant="secondary"
+                size="icon"
+                onClick={handlePrint}
+                aria-label="បោះពុម្ពរូបមន្ត"
+              >
+                <Printer className="h-5 w-5 text-primary" />
+              </Button>
+            </div>
           </div>
-          <div className="absolute top-4 right-4 flex gap-2 no-print">
-            {isFavorite && showRemoveConfirm ? <RemoveFavoriteButton /> : <FavoriteButton />}
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={handlePrint}
-              aria-label="បោះពុម្ពរូបមន្ត"
-            >
-              <Printer className="h-5 w-5 text-primary" />
-            </Button>
-          </div>
-        </div>
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-6 pt-0">
         <div className="mb-6 flex flex-wrap items-center gap-4">
           <Badge variant="secondary" className="text-sm">
             <Clock className="mr-2 h-4 w-4 text-primary" />

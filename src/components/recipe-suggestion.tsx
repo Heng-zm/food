@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, Mic, MicOff, Sparkles, ChefHat } from "lucide-react";
-import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -230,7 +229,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 3 }).map((_, index) => (
         <Card key={index}>
-            <Skeleton className="h-40 w-full" />
             <CardContent className="p-4">
                 <Skeleton className="h-6 w-3/4 mb-2" />
                 <Skeleton className="h-4 w-1/2" />
@@ -255,17 +253,6 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
         className="group cursor-pointer overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-transform duration-200 hover:-translate-y-1"
         onClick={() => handleSelectRecipe(recipe)}
       >
-        <div className="relative h-40 w-full">
-          <Image
-            src={recipe.imageUrl || "https://placehold.co/600x400.png"}
-            alt={recipe.recipeName}
-            fill
-            style={{objectFit: "cover"}}
-            data-ai-hint="gourmet food"
-            className="transition-transform duration-300 group-hover:scale-105"
-          />
-           <div className="absolute inset-0 bg-black/30" />
-        </div>
         <div className="p-4">
           <h3 className="font-headline text-lg font-semibold truncate">{recipe.recipeName}</h3>
           <p className="text-sm text-muted-foreground truncate">{recipe.estimatedCookingTime}</p>

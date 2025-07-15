@@ -227,9 +227,7 @@ const ai = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$g
 var { g: global, __dirname } = __turbopack_context__;
 {
 // This file holds the Genkit flow for suggesting recipes based on user-provided ingredients and cuisine preferences.
-/* __next_internal_action_entry_do_not_use__ [{"409b838c47570daa6b745fec787e26d4bc20dc56c4":"getRecipeDetails","409e029098336e9dd6af0675c12ab8dff5a96814f4":"suggestRecipeAndDetails","40d86b728df33d6a80302096ed731756adba5abc0a":"suggestRecipes"},"",""] */ __turbopack_context__.s({
-    "getRecipeDetails": (()=>getRecipeDetails),
-    "suggestRecipeAndDetails": (()=>suggestRecipeAndDetails),
+/* __next_internal_action_entry_do_not_use__ [{"40d86b728df33d6a80302096ed731756adba5abc0a":"suggestRecipes"},"",""] */ __turbopack_context__.s({
     "suggestRecipes": (()=>suggestRecipes)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
@@ -238,13 +236,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
  * @fileOverview Recipe suggestion flow.
  *
  * - suggestRecipes - A function that suggests a list of recipes based on available ingredients and desired cuisine.
- * - getRecipeDetails - A function that gets the image for a specific recipe.
- * - suggestRecipeAndDetails - A function that suggests recipes and fetches their details (images).
  * - SuggestRecipesInput - The input type for the suggestRecipes function.
  * - Recipe - A single recipe object.
- * - SuggestRecipeAndDetailsOutput - The return type for the suggestRecipeAndDetails function.
- * - GetRecipeDetailsInput - The input type for the getRecipeDetails function.
- * - GetRecipeDetailsOutput - The return type for the getRecipeDetails function.
+ * - SuggestRecipesOutput - The return type for the suggestRecipes function.
  */ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/ai/genkit.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$index$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/genkit/lib/index.mjs [app-rsc] (ecmascript) <module evaluation>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/genkit/lib/common.js [app-rsc] (ecmascript)");
@@ -261,16 +255,10 @@ const RecipeSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_module
     recipeName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
     ingredients: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('បញ្ជីគ្រឿងផ្សំដែលត្រូវការសម្រាប់រូបមន្ត។ បំបែកធាតុនីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
     instructions: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ការណែនាំអំពីការរៀបចំរូបមន្តមួយជំហានម្តងៗ។ បំបែកជំហាននីមួយៗដោយសញ្ញាបន្ទាត់ថ្មី (\\n)។'),
-    estimatedCookingTime: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។'),
-    imageUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().nullable().describe('URL នៃរូបភាពនៃរូបមន្ត។')
+    estimatedCookingTime: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().describe('ពេលវេលាចម្អិនអាហារប៉ាន់ស្មាន (ឧ. 30 នាទី)។')
 });
 const SuggestRecipesOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
-    recipes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].array(RecipeSchema.omit({
-        imageUrl: true
-    }))
-});
-const SuggestRecipeAndDetailsOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
-    recipes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].array(RecipeSchema).describe('The suggested recipes with their images.')
+    recipes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].array(RecipeSchema)
 });
 async function suggestRecipes(input) {
     return suggestRecipesFlow(input);
@@ -304,96 +292,11 @@ const suggestRecipesFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2
     const { output } = await recipePrompt(input);
     return output;
 });
-// Flow to get details (image) for a single recipe
-const GetRecipeDetailsInputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
-    recipeName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string()
-});
-const GetRecipeDetailsOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].object({
-    imageUrl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$genkit$2f$lib$2f$common$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["z"].string().nullable().describe('URL នៃរូបភាពនៃរូបមន្ត។')
-});
-async function getRecipeDetails(input) {
-    return getRecipeDetailsFlow(input);
-}
-const getRecipeDetailsFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ai"].defineFlow({
-    name: 'getRecipeDetailsFlow',
-    inputSchema: GetRecipeDetailsInputSchema,
-    outputSchema: GetRecipeDetailsOutputSchema
-}, async ({ recipeName })=>{
-    try {
-        const { media } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ai"].generate({
-            model: 'googleai/gemini-2.0-flash-preview-image-generation',
-            prompt: `Generate a photorealistic, beautifully plated, and delicious-looking image of the Khmer food dish: '${recipeName}'. The background should be clean and simple to emphasize the food.`,
-            config: {
-                responseModalities: [
-                    'TEXT',
-                    'IMAGE'
-                ]
-            }
-        });
-        if (!media.url) {
-            throw new Error('Image generation failed to return a URL.');
-        }
-        return {
-            imageUrl: media.url
-        };
-    } catch (error) {
-        console.error(`Failed to generate image for ${recipeName}:`, error);
-        // Return null on failure to avoid breaking the whole list
-        return {
-            imageUrl: null
-        };
-    }
-});
-async function suggestRecipeAndDetails(input) {
-    return suggestRecipeAndDetailsFlow(input);
-}
-const suggestRecipeAndDetailsFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ai"].defineFlow({
-    name: 'suggestRecipeAndDetailsFlow',
-    inputSchema: SuggestRecipesInputSchema,
-    outputSchema: SuggestRecipeAndDetailsOutputSchema
-}, async (input)=>{
-    let suggestionResult = null;
-    // Retry logic for recipe suggestion
-    for(let i = 0; i < 2; i++){
-        try {
-            suggestionResult = await suggestRecipesFlow(input);
-            if (suggestionResult?.recipes?.length > 0) {
-                break; // Success, exit loop
-            }
-        } catch (error) {
-            console.error(`Attempt ${i + 1} to get recipe suggestion failed:`, error);
-            if (i === 1) {
-                throw error;
-            }
-        }
-    }
-    if (!suggestionResult || !suggestionResult.recipes || suggestionResult.recipes.length === 0) {
-        throw new Error("Failed to get any recipe suggestions after multiple attempts.");
-    }
-    const recipesWithDetails = [];
-    // Use a sequential for...of loop to avoid rate limiting
-    for (const recipe of suggestionResult.recipes){
-        const details = await getRecipeDetailsFlow({
-            recipeName: recipe.recipeName
-        });
-        recipesWithDetails.push({
-            ...recipe,
-            imageUrl: details.imageUrl
-        });
-    }
-    return {
-        recipes: recipesWithDetails
-    };
-});
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
-    suggestRecipes,
-    getRecipeDetails,
-    suggestRecipeAndDetails
+    suggestRecipes
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(suggestRecipes, "40d86b728df33d6a80302096ed731756adba5abc0a", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getRecipeDetails, "409b838c47570daa6b745fec787e26d4bc20dc56c4", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(suggestRecipeAndDetails, "409e029098336e9dd6af0675c12ab8dff5a96814f4", null);
 }}),
 "[project]/src/app/actions.ts [app-rsc] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
@@ -412,7 +315,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 async function getRecipeSuggestion(data) {
     try {
-        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$suggest$2d$recipe$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["suggestRecipeAndDetails"])(data);
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$flows$2f$suggest$2d$recipe$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["suggestRecipes"])(data);
         return {
             success: true,
             data: result,

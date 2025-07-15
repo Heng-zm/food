@@ -1,16 +1,16 @@
 "use server";
 
 import { 
-  suggestRecipeAndDetails,
+  suggestRecipes,
   type SuggestRecipesInput, 
-  type SuggestRecipeAndDetailsOutput,
+  type SuggestRecipesOutput,
 } from '@/ai/flows/suggest-recipe';
 
 export async function getRecipeSuggestion(
   data: SuggestRecipesInput
-): Promise<{ success: boolean; data: SuggestRecipeAndDetailsOutput | null; error: string | null; }> {
+): Promise<{ success: boolean; data: SuggestRecipesOutput | null; error: string | null; }> {
   try {
-    const result = await suggestRecipeAndDetails(data);
+    const result = await suggestRecipes(data);
     return { success: true, data: result, error: null };
   } catch (error) {
     console.error(error);
