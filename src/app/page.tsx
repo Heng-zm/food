@@ -45,12 +45,12 @@ export default function Home() {
       </header>
 
       <Tabs defaultValue="suggestion" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-muted">
-          <TabsTrigger value="suggestion">
+        <TabsList className="grid w-full grid-cols-2 rounded-lg bg-muted p-1">
+          <TabsTrigger value="suggestion" className="data-[state=active]:bg-card">
             <ChefHat className="mr-2 h-4 w-4" />
             ណែនាំរូបមន្ត
           </TabsTrigger>
-          <TabsTrigger value="favorites">
+          <TabsTrigger value="favorites" className="data-[state=active]:bg-card">
             <Heart className="mr-2 h-4 w-4" />
             ចំណូលចិត្ត
           </TabsTrigger>

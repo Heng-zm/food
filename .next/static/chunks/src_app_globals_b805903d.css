@@ -246,7 +246,7 @@ img, video {
 }
 
 :root {
-  --background: 45 40% 96%;
+  --background: 40 25% 97%;
   --foreground: 25 25% 20%;
   --card: 0 0% 100%;
   --card-foreground: 25 25% 20%;
@@ -254,7 +254,7 @@ img, video {
   --popover-foreground: 25 25% 20%;
   --primary: 25 25% 20%;
   --primary-foreground: 45 40% 96%;
-  --secondary: 60 30% 85%;
+  --secondary: 45 40% 92%;
   --secondary-foreground: 25 25% 15%;
   --muted: 45 40% 92%;
   --muted-foreground: 25 25% 45%;
@@ -2234,6 +2234,10 @@ body {
 
 .data-\[state\=active\]\:bg-background[data-state="active"] {
   background-color: hsl(var(--background));
+}
+
+.data-\[state\=active\]\:bg-card[data-state="active"] {
+  background-color: hsl(var(--card));
 }
 
 .data-\[state\=checked\]\:bg-primary[data-state="checked"] {
