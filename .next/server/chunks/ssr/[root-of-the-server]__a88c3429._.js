@@ -322,7 +322,7 @@ const getRecipeDetailsFlow = __TURBOPACK__imported__module__$5b$project$5d2f$src
 }, async ({ recipeName })=>{
     const { media } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$ai$2f$genkit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ai"].generate({
         model: 'googleai/gemini-2.0-flash-preview-image-generation',
-        prompt: `Generate a photorealistic image of a khmer food dish: ${recipeName}. The image should be beautifully plated, well-lit, and look delicious.`,
+        prompt: `Generate a photorealistic, beautifully plated, and delicious-looking image of the Khmer food dish: '${recipeName}'. The background should be clean and simple to emphasize the food.`,
         config: {
             responseModalities: [
                 'TEXT',
@@ -357,7 +357,7 @@ const suggestRecipeAndDetailsFlow = __TURBOPACK__imported__module__$5b$project$5
             };
         } catch (error) {
             console.error(`Failed to get details for ${recipe.recipeName}`, error);
-            // Return the recipe without an image URL if fetching fails
+            // Return the recipe with a placeholder if fetching fails
             return {
                 ...recipe,
                 imageUrl: "https://placehold.co/600x400.png"
