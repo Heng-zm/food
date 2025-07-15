@@ -139,10 +139,25 @@ const suggestRecipeAndDetailsFlow = ai.defineFlow(
     outputSchema: SuggestRecipeAndDetailsOutputSchema,
   },
   async (input) => {
-    const suggestionResult = await suggestRecipesFlow(input);
+    let suggestionResult: SuggestRecipesOutput | null = null;
+    
+    // Retry logic for recipe suggestion
+    for (let i = 0; i < 2; i++) {
+      try {
+        suggestionResult = await suggestRecipesFlow(input);
+        if (suggestionResult?.recipes?.length > 0) {
+          break; // Success, exit loop
+        }
+      } catch (error) {
+        console.error(`Attempt ${i + 1} to get recipe suggestion failed:`, error);
+        if (i === 1) { // If it's the last attempt, re-throw the error
+          throw error;
+        }
+      }
+    }
     
     if (!suggestionResult || !suggestionResult.recipes || suggestionResult.recipes.length === 0) {
-      throw new Error("Failed to get any recipe suggestions.");
+      throw new Error("Failed to get any recipe suggestions after multiple attempts.");
     }
     
     const recipesWithDetails: Recipe[] = [];
