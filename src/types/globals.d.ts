@@ -1,8 +1,1 @@
-export {};
-
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
+// This file is no longer needed.

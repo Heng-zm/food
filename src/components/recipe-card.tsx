@@ -2,8 +2,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
-import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Play, Pause, Trash2, ImageOff, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Trash2, ImageOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -29,22 +29,8 @@ interface RecipeCardProps {
 }
 
 const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = false }: RecipeCardProps) => {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-
-  useEffect(() => {
-    const synth = window.speechSynthesis;
-    const utterance = new SpeechSynthesisUtterance(recipe.instructions);
-    utterance.lang = 'km-KH';
-    utterance.onend = () => setIsPlaying(false);
-    utteranceRef.current = utterance;
-
-    return () => {
-      synth.cancel();
-    };
-  }, [recipe.instructions]);
   
   useEffect(() => {
     setIsImageLoading(true);
@@ -60,23 +46,6 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
     if(!text) return [];
     return text.split('\n').map(item => item.trim().replace(/^-/,'').trim()).filter(Boolean);
   }
-  
-  const handleReadAloud = () => {
-    const synth = window.speechSynthesis;
-    if (isPlaying) {
-      synth.pause();
-      setIsPlaying(false);
-    } else {
-       if (synth.paused) {
-        synth.resume();
-      } else {
-        if (utteranceRef.current) {
-            synth.speak(utteranceRef.current);
-        }
-      }
-      setIsPlaying(true);
-    }
-  };
 
   const ingredientsList = parseList(recipe.ingredients);
   const instructionsList = parseList(recipe.instructions);
@@ -223,19 +192,6 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                 <BookOpen className="h-6 w-6 text-primary" />
                 ការណែនាំ
               </h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleReadAloud}
-                aria-label="អានការណែនាំឮៗ"
-                className="no-print"
-              >
-                {isPlaying ? (
-                  <Pause className="h-5 w-5 text-primary" />
-                ) : (
-                  <Play className="h-5 w-5 text-primary" />
-                )}
-              </Button>
             </div>
             <ol className="space-y-4">
                {instructionsList.map((instruction, index) => (
