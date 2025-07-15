@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Play, Pause, Trash2, ImageOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -176,7 +177,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
         return (
             <>
                 {isImageLoading && (
-                    <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
+                    <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-muted/80 text-muted-foreground backdrop-blur-sm">
                         <Loader2 className="h-8 w-8 mb-2 animate-spin text-primary" />
                         <p>កំពុង​ផ្ទុក​រូបភាព...</p>
                     </div>
@@ -231,19 +232,15 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
         </div>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="mb-6 grid grid-cols-1 gap-4 text-center sm:grid-cols-2">
-          <div className="flex items-center justify-center gap-2">
-            <Clock className="h-5 w-5 text-primary" />
-            <span className="text-muted-foreground">
-              {recipe.estimatedCookingTime}
-            </span>
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <Flame className="h-5 w-5 text-primary" />
-            <span className="text-muted-foreground">
-              {recipe.nutritionalInformation}
-            </span>
-          </div>
+        <div className="mb-6 flex flex-wrap items-center gap-4">
+          <Badge variant="secondary" className="text-sm">
+            <Clock className="mr-2 h-4 w-4 text-primary" />
+            {recipe.estimatedCookingTime}
+          </Badge>
+          <Badge variant="secondary" className="text-sm">
+            <Flame className="mr-2 h-4 w-4 text-primary" />
+            {recipe.nutritionalInformation}
+          </Badge>
         </div>
 
         <Separator className="my-6" />

@@ -5,8 +5,9 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Mic, MicOff, Sparkles, ChefHat, ChevronRight, RefreshCw } from "lucide-react";
+import { Loader2, Mic, MicOff, Sparkles, ChefHat, RefreshCw, ImageOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +31,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 const formSchema = z.object({
@@ -77,7 +77,7 @@ const allRecommendedDishes = [
 
 const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isFetchingDetails, setIsFetchingDetails] = useState(false);
+  const [fetchingRecipeDetails, setFetchingRecipeDetails] = useState<Record<string, boolean>>({});
   const [suggestedRecipes, setSuggestedRecipes] = useState<Recipe[] | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isListening, setIsListening] = useState(false);
@@ -192,6 +192,10 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 
     if (result.success && result.data) {
       setSuggestedRecipes(result.data.recipes);
+      // Eagerly fetch details for all suggested recipes
+      result.data.recipes.forEach(recipe => {
+        fetchDetailsForRecipe(recipe);
+      });
     } else {
       toast({
         variant: "destructive",
@@ -200,6 +204,25 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
       });
     }
   }
+  
+  const fetchDetailsForRecipe = async (recipe: Recipe) => {
+    if (recipe.imageUrl) return; // Don't fetch if image already exists
+
+    setFetchingRecipeDetails(prev => ({...prev, [recipe.recipeName]: true}));
+
+    const result = await getRecipeDetailsAction({ recipeName: recipe.recipeName });
+
+    if (result.success && result.data) {
+        const fullRecipe = { ...recipe, imageUrl: result.data.imageUrl };
+        setSuggestedRecipes(prev => 
+            prev?.map(r => r.recipeName === recipe.recipeName ? fullRecipe : r) || null
+        );
+    } else {
+        console.error(`Failed to get details for ${recipe.recipeName}:`, result.error);
+        // We can optionally update the state to show an error for this specific card
+    }
+    setFetchingRecipeDetails(prev => ({...prev, [recipe.recipeName]: false}));
+  };
 
   const handleRecommendedDishClick = (dish: string) => {
     form.setValue("ingredients", dish);
@@ -207,46 +230,20 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     form.handleSubmit(onSubmit)();
   };
 
-  const handleRecipeSelect = async (recipe: Recipe) => {
-    setSelectedRecipe(recipe);
-    if (recipe.imageUrl) {
-      return;
-    }
-
-    setIsFetchingDetails(true);
-    
-    const result = await getRecipeDetailsAction({
-      recipeName: recipe.recipeName,
-    });
-    
-    setIsFetchingDetails(false);
-
-    if (result.success && result.data) {
-      const fullRecipe = {
-        ...recipe,
-        imageUrl: result.data.imageUrl,
-      };
-      setSelectedRecipe(fullRecipe);
-      // Update the list as well so we don't have to fetch again
-      setSuggestedRecipes(prev => 
-        prev?.map(r => r.recipeName === recipe.recipeName ? fullRecipe : r) || null
-      );
-    } else {
-       toast({
-        variant: "destructive",
-        title: "មិនអាចទាញយករូបភាពបានទេ",
-        description: result.error || "មានបញ្ហាក្នុងការទាញយករូបភាពសម្រាប់រូបមន្តនេះ។",
-      });
-    }
-  };
-
   const handleAudioUpdate = (audioUrl: string) => {
+    const updateRecipe = (recipeToUpdate: Recipe) => {
+        if (recipeToUpdate) {
+            const updatedRecipe = { ...recipeToUpdate, audioUrl };
+            setSuggestedRecipes(prev => 
+                prev?.map(r => r.recipeName === recipeToUpdate.recipeName ? updatedRecipe : r) || null
+            );
+            if (selectedRecipe && selectedRecipe.recipeName === recipeToUpdate.recipeName) {
+                setSelectedRecipe(updatedRecipe);
+            }
+        }
+    };
     if (selectedRecipe) {
-      const updatedRecipe = { ...selectedRecipe, audioUrl };
-      setSelectedRecipe(updatedRecipe);
-       setSuggestedRecipes(prev => 
-        prev?.map(r => r.recipeName === selectedRecipe.recipeName ? updatedRecipe : r) || null
-      );
+        updateRecipe(selectedRecipe);
     }
   }
 
@@ -257,16 +254,53 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
   }
 
   const LoadingSkeleton = () => (
-    <div className="mt-8 space-y-4">
+    <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {[...Array(5)].map((_, i) => (
-        <Skeleton key={i} className="h-12 w-full" />
+        <Card key={i}>
+            <Skeleton className="h-40 w-full" />
+            <CardContent className="p-4">
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+            </CardContent>
+        </Card>
       ))}
     </div>
   );
+  
+  const renderRecipeThumbnail = (recipe: Recipe) => {
+    const isFetching = fetchingRecipeDetails[recipe.recipeName];
+    const hasImage = !!recipe.imageUrl;
+
+    return (
+      <div className="relative h-40 w-full">
+        {isFetching && !hasImage && (
+            <div className="flex h-full w-full items-center justify-center bg-muted">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+        )}
+        {!isFetching && !hasImage && (
+            <div className="flex h-full w-full flex-col items-center justify-center bg-muted text-muted-foreground">
+                <ImageOff className="h-8 w-8" />
+            </div>
+        )}
+        {hasImage && (
+             <Image
+                src={recipe.imageUrl!}
+                alt={recipe.recipeName}
+                fill
+                objectFit="cover"
+                data-ai-hint="gourmet food"
+                className="transition-transform duration-300 group-hover:scale-105"
+            />
+        )}
+         <div className="absolute inset-0 bg-black/30" />
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6">
-      {!suggestedRecipes && !selectedRecipe && (
+      {!suggestedRecipes && (
         <Card>
           <CardContent className="p-6">
             <Form {...form}>
@@ -371,28 +405,39 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 
       <div className="mt-8">
         {isLoading && <LoadingSkeleton />}
-        {suggestedRecipes && !selectedRecipe && (
-          <Card>
-            <CardContent className="p-4">
-              <h2 className="mb-4 font-headline text-xl font-bold">លទ្ធផលរូបមន្ត</h2>
-              <ul className="space-y-2">
-                {suggestedRecipes.map((recipe) => (
-                  <li key={recipe.recipeName}>
-                    <button
-                      onClick={() => handleRecipeSelect(recipe)}
-                      className="w-full text-left p-3 rounded-md hover:bg-muted transition-colors flex justify-between items-center"
+        {suggestedRecipes && (
+            <>
+            <div className="mb-6 flex flex-col items-center gap-4 text-center md:flex-row md:justify-between">
+                <div>
+                    <h2 className="font-headline text-2xl font-bold md:text-3xl">លទ្ធផលរូបមន្ត</h2>
+                    <p className="text-muted-foreground">នេះគឺជាមុខម្ហូបមួយចំនួនដែលអ្នកអាចធ្វើបាន</p>
+                </div>
+                <Button variant="outline" onClick={handleNewSearch}>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    ស្វែងរក​រូបមន្ត​ថ្មី
+                </Button>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {suggestedRecipes.map((recipe, index) => (
+                <div
+                    key={recipe.recipeName}
+                    className="animate-in fade-in-0 zoom-in-95"
+                    style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
+                >
+                    <Card 
+                        className="group cursor-pointer overflow-hidden transition-transform duration-200 hover:-translate-y-1"
+                        onClick={() => setSelectedRecipe(recipe)}
                     >
-                      <div className="flex items-center gap-3">
-                         <ChefHat className="h-5 w-5 text-primary" />
-                         <span>{recipe.recipeName}</span>
-                      </div>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+                        {renderRecipeThumbnail(recipe)}
+                        <CardContent className="p-4">
+                            <h3 className="font-headline text-lg font-semibold truncate">{recipe.recipeName}</h3>
+                            <p className="text-sm text-muted-foreground truncate">{recipe.estimatedCookingTime}</p>
+                        </CardContent>
+                    </Card>
+                </div>
+              ))}
+            </div>
+            </>
         )}
         
         {selectedRecipe && (
@@ -400,25 +445,18 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
             <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
               <DialogHeader className="p-6 pb-0 flex flex-row items-center justify-between">
                 <DialogTitle>{selectedRecipe.recipeName}</DialogTitle>
-                
               </DialogHeader>
               <RecipeCard
                 recipe={selectedRecipe}
                 isFavorite={favorites.some(fav => fav.recipeName === selectedRecipe.recipeName)}
                 onToggleFavorite={onToggleFavorite}
                 onAudioUpdate={handleAudioUpdate}
-                isFetchingDetails={isFetchingDetails}
+                isFetchingDetails={fetchingRecipeDetails[selectedRecipe.recipeName]}
               />
             </DialogContent>
           </Dialog>
         )}
 
-        {suggestedRecipes && (
-           <Button variant="outline" onClick={handleNewSearch} className="mt-4">
-             <RefreshCw className="mr-2 h-4 w-4" />
-             ស្វែងរក​រូបមន្ត​ថ្មី
-           </Button>
-        )}
       </div>
     </div>
   );
