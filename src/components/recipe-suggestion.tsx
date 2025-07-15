@@ -443,3 +443,4 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
 };
 
 export default RecipeSuggestion;
+
