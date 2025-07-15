@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Clock, Flame, Heart, Printer, UtensilsCrossed, BookOpen, Trash2, ImageOff, Loader2 } from "lucide-react";
+import { Clock, Heart, Printer, UtensilsCrossed, BookOpen, Trash2, ImageOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -162,10 +162,6 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
           <Badge variant="secondary" className="text-sm">
             <Clock className="mr-2 h-4 w-4 text-primary" />
             {recipe.estimatedCookingTime}
-          </Badge>
-          <Badge variant="secondary" className="text-sm">
-            <Flame className="mr-2 h-4 w-4 text-primary" />
-            {recipe.nutritionalInformation}
           </Badge>
         </div>
         
