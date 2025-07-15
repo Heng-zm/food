@@ -2,19 +2,23 @@
 'use server';
 
 /**
- * @fileOverview Recipe suggestion and image generation flows.
+ * @fileOverview Recipe suggestion, image generation, and TTS flows.
  *
  * - suggestRecipes - Suggests a list of recipes based on ingredients and cuisine.
  * - generateRecipeImage - Generates an image for a specific recipe name.
+ * - synthesizeSpeech - Converts recipe instructions text to speech.
  * - SuggestRecipesInput - The input type for the suggestRecipes function.
  * - Recipe - A single recipe object.
  * - SuggestRecipesOutput - The return type for the suggestRecipes function.
  * - GenerateRecipeImageInput - The input type for the generateRecipeImage function.
  * - GenerateRecipeImageOutput - The return type for the generateRecipeImage function.
+ * - SynthesizeSpeechInput - The input type for the synthesizeSpeech function.
+ * - SynthesizeSpeechOutput - The return type for the synthesizeSpeech function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import wav from 'wav';
 
 // Schema for recipe suggestion input
 const SuggestRecipesInputSchema = z.object({
@@ -118,13 +122,85 @@ const generateRecipeImageFlow = ai.defineFlow(
             if (media?.url) {
                 return { imageUrl: media.url };
             }
-             // On failure, return an empty string to satisfy the schema.
              return { imageUrl: "" };
 
         } catch (error) {
              console.error(`Failed to generate image for "${recipeName}":`, error);
-              // On error, return an empty string to satisfy the schema.
              return { imageUrl: "" };
+        }
+    }
+);
+
+
+// Schemas and flow for Text-to-Speech
+const SynthesizeSpeechInputSchema = z.object({
+    text: z.string().describe("The text to be converted to speech."),
+});
+export type SynthesizeSpeechInput = z.infer<typeof SynthesizeSpeechInputSchema>;
+
+const SynthesizeSpeechOutputSchema = z.object({
+    audioUrl: z.string().describe("The data URI of the generated audio file in WAV format."),
+});
+export type SynthesizeSpeechOutput = z.infer<typeof SynthesizeSpeechOutputSchema>;
+
+export async function synthesizeSpeech(input: SynthesizeSpeechInput): Promise<SynthesizeSpeechOutput> {
+    return synthesizeSpeechFlow(input);
+}
+
+async function toWav(pcmData: Buffer, channels = 1, rate = 24000, sampleWidth = 2): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const writer = new wav.Writer({
+      channels,
+      sampleRate: rate,
+      bitDepth: sampleWidth * 8,
+    });
+
+    let bufs: Buffer[] = [];
+    writer.on('error', reject);
+    writer.on('data', (d) => bufs.push(d));
+    writer.on('end', () => resolve(Buffer.concat(bufs).toString('base64')));
+
+    writer.write(pcmData);
+    writer.end();
+  });
+}
+
+const synthesizeSpeechFlow = ai.defineFlow(
+    {
+        name: 'synthesizeSpeechFlow',
+        inputSchema: SynthesizeSpeechInputSchema,
+        outputSchema: SynthesizeSpeechOutputSchema,
+    },
+    async ({ text }) => {
+        try {
+            const { media } = await ai.generate({
+                model: 'googleai/gemini-2.5-flash-preview-tts',
+                config: {
+                    responseModalities: ['AUDIO'],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: 'Algenib' },
+                        },
+                    },
+                },
+                prompt: text,
+            });
+
+            if (!media?.url) {
+                 throw new Error('No audio data returned from TTS model.');
+            }
+
+            const audioBuffer = Buffer.from(
+                media.url.substring(media.url.indexOf(',') + 1),
+                'base64'
+            );
+
+            const wavBase64 = await toWav(audioBuffer);
+            return { audioUrl: `data:audio/wav;base64,${wavBase64}` };
+
+        } catch (error) {
+            console.error('Failed to synthesize speech:', error);
+            return { audioUrl: '' };
         }
     }
 );

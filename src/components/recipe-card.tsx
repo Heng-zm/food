@@ -3,12 +3,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Clock, Heart, Printer, UtensilsCrossed, BookOpen, Trash2, Image as ImageIcon, Loader2, ImageOff } from "lucide-react";
+import { Clock, Heart, Printer, UtensilsCrossed, BookOpen, Trash2, Image as ImageIcon, Loader2, ImageOff, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import type { Recipe } from "@/ai/flows/suggest-recipe";
-import { getRecipeImage } from "@/app/actions";
+import { getRecipeImage, getTextToSpeech } from "@/app/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,6 +36,9 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handlePrint = () => {
@@ -64,6 +67,25 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
       toast({
         variant: "destructive",
         title: "Image Generation Failed",
+        description: errorMsg,
+      });
+    }
+  };
+  
+  const handleGenerateAudio = async () => {
+    setIsGeneratingAudio(true);
+    setAudioError(null);
+    const result = await getTextToSpeech({ text: recipe.instructions });
+    setIsGeneratingAudio(false);
+
+    if (result.success && result.data?.audioUrl) {
+      setAudioUrl(result.data.audioUrl);
+    } else {
+      const errorMsg = result.error || "An unknown error occurred while generating audio.";
+      setAudioError(errorMsg);
+      toast({
+        variant: "destructive",
+        title: "Audio Generation Failed",
         description: errorMsg,
       });
     }
@@ -210,7 +232,34 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
                 <BookOpen className="h-6 w-6 text-primary" />
                 ការណែនាំ
               </h3>
+               <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateAudio}
+                  disabled={isGeneratingAudio || !!audioUrl}
+                  className="no-print"
+                >
+                  {isGeneratingAudio ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Volume2 className="mr-2 h-4 w-4" />
+                  )}
+                  {audioUrl ? 'បានបង្កើត' : 'ស្តាប់ការណែនាំ'}
+                </Button>
             </div>
+             {audioUrl && (
+              <div className="mb-4 no-print">
+                <audio controls src={audioUrl} className="w-full">
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            )}
+             {audioError && (
+              <Alert variant="destructive" className="mb-4 no-print">
+                <AlertTitle>Audio Failed</AlertTitle>
+                <AlertDescription>{audioError}</AlertDescription>
+              </Alert>
+            )}
             <ol className="space-y-4">
                {instructionsList.map((instruction, index) => (
                 <li key={index} className="flex items-start gap-3">
