@@ -5,7 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Mic, MicOff, Sparkles, RefreshCw, ChefHat } from "lucide-react";
+import { Loader2, Mic, MicOff, Sparkles, ChefHat } from "lucide-react";
+import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -27,10 +28,18 @@ import type { Recipe } from "@/ai/flows/suggest-recipe";
 import { Badge } from "@/components/ui/badge";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 
 
@@ -78,14 +87,14 @@ const allRecommendedDishes = [
 
 const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [suggestedRecipe, setSuggestedRecipe] = useState<Recipe | null>(null);
+  const [suggestedRecipes, setSuggestedRecipes] = useState<Recipe[]>([]);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
   const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(false);
   const [recommendedDishes, setRecommendedDishes] = useState<string[]>([]);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [excludedRecipes, setExcludedRecipes] = useState<string[]>([]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -184,114 +193,92 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
     }
   };
 
-  const handleSuggestionRequest = async (values: z.infer<typeof formSchema>, isNewRequest: boolean = true) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    
-    // If it's a brand new search, clear the old recipe and exclusion list
-    if (isNewRequest) {
-      setSuggestedRecipe(null);
-      setExcludedRecipes([]);
-    }
-
-    const result = await getRecipeSuggestion({ 
-      ...values, 
-      excludeRecipes: isNewRequest ? [] : excludedRecipes 
-    });
-    
+    setSuggestedRecipes([]);
+    const result = await getRecipeSuggestion(values);
     setIsLoading(false);
 
-    if (result.success && result.data?.recipe) {
-      const newRecipe = result.data.recipe;
-      setSuggestedRecipe(newRecipe);
-      // Add the new recipe to the exclusion list for the next request
-      setExcludedRecipes(prev => [...prev, newRecipe.recipeName]);
+    if (result.success && result.data?.recipes) {
+      setSuggestedRecipes(result.data.recipes);
     } else {
       toast({
         variant: "destructive",
         title: "មានបញ្ហាអ្វីមួយកើតឡើង!",
         description: result.error || "មានបញ្ហាជាមួយសំណើរបស់អ្នក។ សូមសាកល្បងម្ដងទៀត។",
       });
-      if (!isNewRequest) {
-        // If getting another suggestion fails, don't clear the current one
-        setIsLoading(false);
-      }
     }
-  }
+  };
 
   const handleRecommendedDishClick = (dish: string) => {
     form.setValue("ingredients", dish);
     form.setValue("cuisine", "ខ្មែរ");
-    handleSuggestionRequest(form.getValues(), true);
+    onSubmit(form.getValues());
   };
 
-  const handleNewSearch = () => {
-    setSuggestedRecipe(null);
-    setExcludedRecipes([]);
-    form.reset();
-  }
+  const handleSelectRecipe = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+  };
 
-  const handleTryAnother = () => {
-    const values = form.getValues();
-    if (values.ingredients && values.cuisine) {
-      handleSuggestionRequest(values, false);
-    } else {
-       toast({
-        variant: "destructive",
-        title: "ត្រូវការគ្រឿងផ្សំ",
-        description: "សូមប្រាកដថាអ្នកបានបញ្ចូលគ្រឿងផ្សំ និងប្រភេទម្ហូប។",
-      });
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setSelectedRecipe(null);
     }
   }
 
   const LoadingSkeleton = () => (
-    <div className="mt-8">
-      <Card>
-        <Skeleton className="h-64 w-full" />
-        <CardContent className="p-6">
-            <Skeleton className="h-8 w-3/4 mb-4" />
-            <div className="flex gap-4 mb-6">
-              <Skeleton className="h-6 w-24" />
-              <Skeleton className="h-6 w-32" />
-            </div>
-            <Skeleton className="h-px w-full mb-6" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <Skeleton className="h-6 w-1/3 mb-4" />
-                <Skeleton className="h-5 w-full mb-2" />
-                <Skeleton className="h-5 w-5/6 mb-2" />
-                <Skeleton className="h-5 w-full" />
-              </div>
-               <div>
-                <Skeleton className="h-6 w-1/3 mb-4" />
-                <Skeleton className="h-5 w-full mb-2" />
-                <Skeleton className="h-5 w-5/6 mb-2" />
-                <Skeleton className="h-5 w-full" />
-              </div>
-            </div>
-        </CardContent>
-      </Card>
+    <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <Card key={index}>
+            <Skeleton className="h-40 w-full" />
+            <CardContent className="p-4">
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+            </CardContent>
+        </Card>
+      ))}
     </div>
   );
   
-  const RecipeDetailView = () => {
-    if (!suggestedRecipe) return null;
+  const RecipeDetailView = ({ recipe }: { recipe: Recipe }) => (
+    <div className="max-h-[85vh] overflow-y-auto">
+      <RecipeCard 
+        recipe={recipe}
+        isFavorite={favorites.some(fav => fav.recipeName === recipe.recipeName)}
+        onToggleFavorite={onToggleFavorite}
+      />
+    </div>
+  );
 
-    return (
-      <div className="max-h-[85vh] overflow-y-auto">
-        <RecipeCard
-          recipe={suggestedRecipe}
-          isFavorite={favorites.some(fav => fav.recipeName === suggestedRecipe.recipeName)}
-          onToggleFavorite={onToggleFavorite}
-        />
+  const renderRecipeItem = (recipe: Recipe) => (
+      <div 
+        className="group cursor-pointer overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-transform duration-200 hover:-translate-y-1"
+        onClick={() => handleSelectRecipe(recipe)}
+      >
+        <div className="relative h-40 w-full">
+          <Image
+            src={recipe.imageUrl || "https://placehold.co/600x400.png"}
+            alt={recipe.recipeName}
+            fill
+            style={{objectFit: "cover"}}
+            data-ai-hint="gourmet food"
+            className="transition-transform duration-300 group-hover:scale-105"
+          />
+           <div className="absolute inset-0 bg-black/30" />
+        </div>
+        <div className="p-4">
+          <h3 className="font-headline text-lg font-semibold truncate">{recipe.recipeName}</h3>
+          <p className="text-sm text-muted-foreground truncate">{recipe.estimatedCookingTime}</p>
+        </div>
       </div>
-    );
-  };
+  );
   
-  const renderInitialView = () => (
-     <Card>
+  return (
+    <div className="mt-6">
+      <Card>
         <CardContent className="p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit((values) => handleSuggestionRequest(values, true))} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <FormField
                   control={form.control}
@@ -391,42 +378,43 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
           </div>
         </CardContent>
       </Card>
-  );
 
-  const renderResultView = () => (
-     <>
-      <div className="mb-6 flex flex-col items-center gap-4 text-center md:flex-row md:justify-between">
-          <div>
-              <h2 className="font-headline text-2xl font-bold md:text-3xl">លទ្ធផលរូបមន្ត</h2>
-              <p className="text-muted-foreground">នេះគឺជាមុខម្ហូបដែលអ្នកអាចធ្វើបាន</p>
-          </div>
-          <div className="flex gap-2">
-             <Button variant="outline" onClick={handleNewSearch}>
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  ស្វែងរក​រូបមន្ត​ថ្មី
-              </Button>
-              <Button onClick={handleTryAnother} disabled={isLoading} className="bg-accent text-accent-foreground hover:bg-accent/90">
-                 {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    </>
-                  ) : (
-                    "សាកល្បងម្ហូបផ្សេង"
-                  )}
-              </Button>
-          </div>
-      </div>
-      <div className="animate-in fade-in-0 zoom-in-95">
-        <RecipeDetailView />
-      </div>
-    </>
-  );
-
-  return (
-    <div className="mt-6">
-      {!suggestedRecipe && !isLoading && renderInitialView()}
       {isLoading && <LoadingSkeleton />}
-      {suggestedRecipe && !isLoading && renderResultView()}
+      
+      {!isLoading && suggestedRecipes.length > 0 && (
+          <div className="mt-8">
+              <h2 className="mb-6 font-headline text-2xl font-bold md:text-3xl">លទ្ធផលរូបមន្ត</h2>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {suggestedRecipes.map((recipe) => (
+                      isDesktop ? (
+                          <Dialog key={recipe.recipeName} open={selectedRecipe?.recipeName === recipe.recipeName} onOpenChange={handleOpenChange}>
+                              <DialogTrigger asChild>
+                                  {renderRecipeItem(recipe)}
+                              </DialogTrigger>
+                              <DialogContent className="max-h-[90svh] overflow-y-auto p-0 sm:max-w-3xl">
+                                  <DialogHeader className="p-6 pb-0">
+                                      <DialogTitle>{recipe.recipeName}</DialogTitle>
+                                  </DialogHeader>
+                                  <RecipeDetailView recipe={recipe} />
+                              </DialogContent>
+                          </Dialog>
+                      ) : (
+                          <Drawer key={recipe.recipeName} open={selectedRecipe?.recipeName === recipe.recipeName} onOpenChange={handleOpenChange}>
+                              <DrawerTrigger asChild>
+                                  {renderRecipeItem(recipe)}
+                              </DrawerTrigger>
+                              <DrawerContent>
+                                  <DrawerHeader className="text-left">
+                                      <DrawerTitle>{recipe.recipeName}</DrawerTitle>
+                                  </DrawerHeader>
+                                  <RecipeDetailView recipe={recipe} />
+                              </DrawerContent>
+                          </Drawer>
+                      )
+                  ))}
+              </div>
+          </div>
+      )}
     </div>
   );
 };

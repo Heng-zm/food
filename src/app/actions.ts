@@ -2,12 +2,12 @@
 
 import { 
   suggestRecipeAndDetails,
-  type SuggestRecipeInput, 
+  type SuggestRecipesInput, 
   type SuggestRecipeAndDetailsOutput,
 } from '@/ai/flows/suggest-recipe';
 
 export async function getRecipeSuggestion(
-  data: SuggestRecipeInput
+  data: SuggestRecipesInput
 ): Promise<{ success: boolean; data: SuggestRecipeAndDetailsOutput | null; error: string | null; }> {
   try {
     const result = await suggestRecipeAndDetails(data);

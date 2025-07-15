@@ -5,10 +5,10 @@
 /**
  * @fileOverview Recipe suggestion flow.
  *
- * - suggestRecipe - A function that suggests recipes based on available ingredients and desired cuisine.
+ * - suggestRecipes - A function that suggests a list of recipes based on available ingredients and desired cuisine.
  * - getRecipeDetails - A function that gets the image for a specific recipe.
- * - suggestRecipeAndDetails - A function that suggests a recipe and fetches its details (image).
- * - SuggestRecipeInput - The input type for the suggestRecipe function.
+ * - suggestRecipeAndDetails - A function that suggests recipes and fetches their details (images).
+ * - SuggestRecipesInput - The input type for the suggestRecipes function.
  * - Recipe - A single recipe object.
  * - SuggestRecipeAndDetailsOutput - The return type for the suggestRecipeAndDetails function.
  * - GetRecipeDetailsInput - The input type for the getRecipeDetails function.
@@ -18,14 +18,13 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const SuggestRecipeInputSchema = z.object({
+const SuggestRecipesInputSchema = z.object({
   ingredients: z
     .string()
     .describe('បញ្ជីគ្រឿងផ្សំដែលមាន រាយដោយមានសញ្ញាក្បៀស។'),
   cuisine: z.string().describe('ប្រភេទម្ហូបដែលចង់បាន (ឧ. ខ្មែរ, អ៊ីតាលី)។'),
-  excludeRecipes: z.array(z.string()).optional().describe('បញ្ជីឈ្មោះរូបមន្តដែលត្រូវដកចេញពីលទ្ធផល។'),
 });
-export type SuggestRecipeInput = z.infer<typeof SuggestRecipeInputSchema>;
+export type SuggestRecipesInput = z.infer<typeof SuggestRecipesInputSchema>;
 
 const RecipeSchema = z.object({
   recipeName: z.string().describe('ឈ្មោះរូបមន្តដែលបានណែនាំ។'),
@@ -36,37 +35,32 @@ const RecipeSchema = z.object({
 });
 export type Recipe = z.infer<typeof RecipeSchema>;
 
-const SuggestRecipeOutputSchema = z.object({
-    recipe: RecipeSchema.omit({ imageUrl: true })
+const SuggestRecipesOutputSchema = z.object({
+  recipes: z.array(RecipeSchema.omit({ imageUrl: true })),
 });
-export type SuggestRecipeOutput = z.infer<typeof SuggestRecipeOutputSchema>;
+export type SuggestRecipesOutput = z.infer<typeof SuggestRecipesOutputSchema>;
 
 const SuggestRecipeAndDetailsOutputSchema = z.object({
-    recipe: RecipeSchema.describe('The suggested recipe with its image.'),
+  recipes: z.array(RecipeSchema).describe('The suggested recipes with their images.'),
 });
 export type SuggestRecipeAndDetailsOutput = z.infer<typeof SuggestRecipeAndDetailsOutputSchema>;
 
-
-export async function suggestRecipe(input: SuggestRecipeInput): Promise<SuggestRecipeOutput> {
-  return suggestRecipeFlow(input);
+export async function suggestRecipes(input: SuggestRecipesInput): Promise<SuggestRecipesOutput> {
+  return suggestRecipesFlow(input);
 }
 
 const recipePrompt = ai.definePrompt({
   name: 'recipePrompt',
-  input: {schema: SuggestRecipeInputSchema},
+  input: {schema: SuggestRecipesInputSchema},
   output: {
     format: 'json',
-    schema: SuggestRecipeOutputSchema,
+    schema: SuggestRecipesOutputSchema,
   },
   prompt: `You are a world-class chef specializing in creating delicious recipes based on available ingredients and cuisine preferences.
 
   Please provide the entire response in Khmer (Cambodia).
 
-  Based on the provided ingredients and cuisine, suggest one single, excellent, detailed recipe.
-  
-  {{#if excludeRecipes}}
-  Do not suggest any of the following recipes: {{#each excludeRecipes}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}.
-  {{/if}}
+  Based on the provided ingredients and cuisine, suggest 5 distinct, excellent, detailed recipes.
 
   Ingredients: {{{ingredients}}}
   Cuisine: {{{cuisine}}}
@@ -75,18 +69,17 @@ const recipePrompt = ai.definePrompt({
 `,
 });
 
-const suggestRecipeFlow = ai.defineFlow(
+const suggestRecipesFlow = ai.defineFlow(
   {
-    name: 'suggestRecipeFlow',
-    inputSchema: SuggestRecipeInputSchema,
-    outputSchema: SuggestRecipeOutputSchema,
+    name: 'suggestRecipesFlow',
+    inputSchema: SuggestRecipesInputSchema,
+    outputSchema: SuggestRecipesOutputSchema,
   },
   async input => {
     const {output} = await recipePrompt(input);
     return output!;
   }
 );
-
 
 // Flow to get details (image) for a single recipe
 const GetRecipeDetailsInputSchema = z.object({
@@ -99,7 +92,6 @@ const GetRecipeDetailsOutputSchema = z.object({
 });
 export type GetRecipeDetailsOutput = z.infer<typeof GetRecipeDetailsOutputSchema>;
 
-
 export async function getRecipeDetails(input: GetRecipeDetailsInput): Promise<GetRecipeDetailsOutput> {
   return getRecipeDetailsFlow(input);
 }
@@ -111,51 +103,56 @@ const getRecipeDetailsFlow = ai.defineFlow(
     outputSchema: GetRecipeDetailsOutputSchema,
   },
   async ({ recipeName }) => {
-    const { media } = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: `Generate a photorealistic, beautifully plated, and delicious-looking image of the Khmer food dish: '${recipeName}'. The background should be clean and simple to emphasize the food.`,
-      config: {
-        responseModalities: ['TEXT', 'IMAGE'],
-      },
-    });
+    try {
+      const { media } = await ai.generate({
+        model: 'googleai/gemini-2.0-flash-preview-image-generation',
+        prompt: `Generate a photorealistic, beautifully plated, and delicious-looking image of the Khmer food dish: '${recipeName}'. The background should be clean and simple to emphasize the food.`,
+        config: {
+          responseModalities: ['TEXT', 'IMAGE'],
+        },
+      });
 
-    if (!media.url) {
-      throw new Error('Image generation failed.');
+      if (!media.url) {
+        throw new Error('Image generation failed to return a URL.');
+      }
+      
+      return {
+        imageUrl: media.url,
+      };
+    } catch (error) {
+       console.error(`Failed to generate image for ${recipeName}:`, error);
+       // Return a placeholder on failure to avoid breaking the whole list
+       return { imageUrl: "https://placehold.co/600x400.png" };
     }
-    
-    return {
-      imageUrl: media.url,
-    };
   }
 );
 
 // New flow that combines recipe suggestion and image generation
-export async function suggestRecipeAndDetails(input: SuggestRecipeInput): Promise<SuggestRecipeAndDetailsOutput> {
+export async function suggestRecipeAndDetails(input: SuggestRecipesInput): Promise<SuggestRecipeAndDetailsOutput> {
   return suggestRecipeAndDetailsFlow(input);
 }
 
 const suggestRecipeAndDetailsFlow = ai.defineFlow(
   {
     name: 'suggestRecipeAndDetailsFlow',
-    inputSchema: SuggestRecipeInputSchema,
+    inputSchema: SuggestRecipesInputSchema,
     outputSchema: SuggestRecipeAndDetailsOutputSchema,
   },
   async (input) => {
-    const suggestionResult = await suggestRecipeFlow(input);
+    const suggestionResult = await suggestRecipesFlow(input);
     
-    if (!suggestionResult || !suggestionResult.recipe) {
-      throw new Error("Failed to get a recipe suggestion.");
+    if (!suggestionResult || !suggestionResult.recipes || suggestionResult.recipes.length === 0) {
+      throw new Error("Failed to get any recipe suggestions.");
     }
     
-    const recipe = suggestionResult.recipe;
+    const recipesWithDetails: Recipe[] = [];
 
-    try {
-      const details = await getRecipeDetailsFlow({ recipeName: recipe.recipeName });
-      return { recipe: { ...recipe, imageUrl: details.imageUrl } };
-    } catch (error) {
-      console.error(`Failed to get details for ${recipe.recipeName}`, error);
-      // Return the recipe with a placeholder if fetching fails
-      return { recipe: { ...recipe, imageUrl: "https://placehold.co/600x400.png" } };
+    // Use a sequential for...of loop to avoid rate limiting
+    for (const recipe of suggestionResult.recipes) {
+        const details = await getRecipeDetailsFlow({ recipeName: recipe.recipeName });
+        recipesWithDetails.push({ ...recipe, imageUrl: details.imageUrl });
     }
+
+    return { recipes: recipesWithDetails };
   }
 );
