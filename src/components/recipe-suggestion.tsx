@@ -324,7 +324,14 @@ const RecipeSuggestion = ({ favorites, onToggleFavorite }: RecipeSuggestionProps
                         <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="bg-muted">
-                              <SelectValue placeholder="ជ្រើសរើសប្រភេទម្ហូប" />
+                                <SelectValue>
+                                  {field.value ? (
+                                    <div className="flex items-center gap-2">
+                                      <span>{cuisineOptions.find(opt => opt.name === field.value)?.flag}</span>
+                                      <span>{field.value}</span>
+                                    </div>
+                                  ) : "ជ្រើសរើសប្រភេទម្ហូប"}
+                                </SelectValue>
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
