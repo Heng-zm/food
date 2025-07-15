@@ -59,14 +59,17 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
     if (result.success && result.data?.imageUrl) {
       setImageUrl(result.data.imageUrl);
     } else {
-      setImageError(result.error || "An unknown error occurred while generating the image.");
+      const errorMsg = result.error || "An unknown error occurred while generating the image.";
+      setImageError(errorMsg);
       toast({
         variant: "destructive",
         title: "Image Generation Failed",
-        description: result.error,
+        description: errorMsg,
       });
     }
   };
+
+  const hasQuotaError = imageError && imageError.toLowerCase().includes('quota');
 
   const FavoriteButton = () => (
     <Button
@@ -106,6 +109,13 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
       </AlertDialogContent>
     </AlertDialog>
   );
+  
+  const getErrorMessage = () => {
+    if (hasQuotaError) {
+      return "កូតាបង្កើតរូបភាពត្រូវបានប្រើអស់ហើយ។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ។";
+    }
+    return imageError;
+  }
 
   return (
     <div className="w-full overflow-hidden printable-area">
@@ -119,7 +129,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
           <Alert variant="destructive">
             <ImageOff className="h-4 w-4" />
             <AlertTitle>Image Failed</AlertTitle>
-            <AlertDescription>{imageError}</AlertDescription>
+            <AlertDescription>{getErrorMessage()}</AlertDescription>
           </Alert>
         </div>
        )}
@@ -161,7 +171,7 @@ const RecipeCard = ({ recipe, isFavorite, onToggleFavorite, showRemoveConfirm = 
             {recipe.estimatedCookingTime}
           </Badge>
           {!imageUrl && !isGeneratingImage && (
-            <Button variant="outline" size="sm" onClick={handleGenerateImage} disabled={isGeneratingImage}>
+            <Button variant="outline" size="sm" onClick={handleGenerateImage} disabled={isGeneratingImage || hasQuotaError}>
               {isGeneratingImage ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
